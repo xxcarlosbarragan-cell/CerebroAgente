@@ -1,41 +1,113 @@
-﻿$ErrorActionPreference = 'SilentlyContinue'
+# Cerebro Agent 2.3 - servidor local ligero y actualizacion OTA.
+# PowerShell 5.1 / Windows 10+; se preservan las URLs y el contrato GET /api/data.
+$ErrorActionPreference = 'Stop'
 $script:Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# --- 1. MOTOR DE AUTO-ACTUALIZACIÓN EN LA NUBE ---
 function Buscar-Actualizaciones {
+    # Direcciones oficiales existentes: no modificar.
     $urlVersion = "https://raw.githubusercontent.com/xxCarlosbarragan-cell/CerebroAgente/main/version.txt"
-    $urlScript  = "https://raw.githubusercontent.com/xxCarlosbarragan-cell/CerebroAgente/main/CerebroAgent.ps1"
-    $urlHtml    = "https://raw.githubusercontent.com/xxCarlosbarragan-cell/CerebroAgente/main/interfaz.html"
-    
-    $versionLocal = 2.2
+    $urlScript = "https://raw.githubusercontent.com/xxCarlosbarragan-cell/CerebroAgente/main/CerebroAgent.ps1"
+    $urlHtml = "https://raw.githubusercontent.com/xxCarlosbarragan-cell/CerebroAgente/main/interfaz.html"
 
-    try {
-        Write-Host "Buscando actualizaciones..."
-        $versionRemotaTexto = Invoke-RestMethod -Uri $urlVersion -UseBasicParsing
-        $versionRemota = [double]$versionRemotaTexto.Trim()
-        
-        if ($versionRemota -gt $versionLocal) {
-            Write-Host "¡Nueva version v$versionRemota! Instalando..."
-            Invoke-WebRequest -Uri $urlScript -OutFile $PSCommandPath -UseBasicParsing
-            Invoke-WebRequest -Uri $urlHtml -OutFile (Join-Path $script:Root "interfaz.html") -UseBasicParsing
-            Start-Sleep -Seconds 2
-            Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
-            exit
+    $versionPath = Join-Path $script:Root 'version.txt'
+    # Valor de recuperacion para el primer inicio de v2.3 desde la v2.2 sin archivo version.txt.
+    $versionLocal = 2.3
+    if (Test-Path -LiteralPath $versionPath) {
+        try {
+            $versionLocal = [double]::Parse(
+                ([System.IO.File]::ReadAllText($versionPath)).Trim(),
+                [System.Globalization.CultureInfo]::InvariantCulture
+            )
+        } catch { $versionLocal = 2.3 }
+    }
+
+    # Ensure v2.2 OTA upgrades also receive the canonical version.txt file.
+    # Only create the missing file; never delete legacy user files.
+    if (-not (Test-Path -LiteralPath $versionPath)) {
+        try {
+            [System.IO.File]::WriteAllText(
+                $versionPath, '2.3' + [Environment]::NewLine,
+                (New-Object System.Text.UTF8Encoding($false))
+            )
+        } catch {
+            Write-Warning ('No se pudo crear version.txt: ' + $_.Exception.Message)
         }
-    } catch {}
+    }
+
+    $tempScript = $null
+    $tempHtml = $null
+    try {
+        $response = Invoke-RestMethod -Uri $urlVersion -UseBasicParsing -TimeoutSec 6
+        $remoteText = ([string]$response).Trim()
+        $versionRemote = [double]::Parse($remoteText, [System.Globalization.CultureInfo]::InvariantCulture)
+        if ($versionRemote -le $versionLocal) { return }
+        Write-Host "Cerebro Agent: instalando version $remoteText desde GitHub..."
+
+        $tempScript = Join-Path $script:Root ([System.IO.Path]::GetRandomFileName() + '.ps1.tmp')
+        $tempHtml = Join-Path $script:Root ([System.IO.Path]::GetRandomFileName() + '.html.tmp')
+        Invoke-WebRequest -Uri $urlScript -OutFile $tempScript -UseBasicParsing -TimeoutSec 20
+        Invoke-WebRequest -Uri $urlHtml -OutFile $tempHtml -UseBasicParsing -TimeoutSec 20
+
+        # Comprobaciones basicas de archivos completos; no sustituyen una firma digital.
+        $newScript = Get-Content -LiteralPath $tempScript -Raw -Encoding UTF8
+        $newHtml = Get-Content -LiteralPath $tempHtml -Raw -Encoding UTF8
+        if (($newScript -notmatch 'Get-FastSnapshot') -or
+            ($newScript -notmatch 'HttpListener') -or
+            ($newHtml -notmatch '<html') -or
+            ($newHtml -notmatch '</html>')) {
+            throw 'Descarga incompleta o formato inesperado: se cancela la actualizacion.'
+        }
+
+        $htmlPath = Join-Path $script:Root 'interfaz.html'
+        # Guardar en RAM para recuperar los archivos anteriores si la copia falla.
+        $oldScript = [System.IO.File]::ReadAllBytes($PSCommandPath)
+        $oldHtml = $null
+        if (Test-Path -LiteralPath $htmlPath) {
+            $oldHtml = [System.IO.File]::ReadAllBytes($htmlPath)
+        }
+        try {
+            [System.IO.File]::Copy($tempHtml, $htmlPath, $true)
+            [System.IO.File]::Copy($tempScript, $PSCommandPath, $true)
+            [System.IO.File]::WriteAllText(
+                $versionPath, $remoteText + [Environment]::NewLine,
+                (New-Object System.Text.UTF8Encoding($false))
+            )
+        } catch {
+            [System.IO.File]::WriteAllBytes($PSCommandPath, $oldScript)
+            if ($null -ne $oldHtml) {
+                [System.IO.File]::WriteAllBytes($htmlPath, $oldHtml)
+            }
+            throw
+        }
+
+        Write-Host 'Actualizacion descargada; reiniciando servidor local.'
+        Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+        exit
+    } catch {
+        Write-Warning ("OTA no disponible: " + $_.Exception.Message)
+    } finally {
+        if ($tempScript -and (Test-Path -LiteralPath $tempScript)) { Remove-Item -LiteralPath $tempScript -Force -ErrorAction SilentlyContinue }
+        if ($tempHtml -and (Test-Path -LiteralPath $tempHtml)) { Remove-Item -LiteralPath $tempHtml -Force -ErrorAction SilentlyContinue }
+    }
 }
 
 Buscar-Actualizaciones
 
-# --- 2. MOTOR TÁCTICO ULTRARRÁPIDO ---
+# REGLA DE RENDIMIENTO: no consultar Win32_PerfFormattedData_PerfDisk_PhysicalDisk.
+# La lectura se limita a CPU y RAM, tal como en la version 2.2.
 function Get-FastSnapshot {
-    $cpuPct = 0; $ramPct = 0
+    $cpuPct = $null
+    $ramPct = $null
     try {
         $os = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop
-        $ramPct = [math]::Round((1.0 - ($os.FreePhysicalMemory / $os.TotalVisibleMemorySize)) * 100.0, 0)
+        if ($os.TotalVisibleMemorySize -gt 0) {
+            $ramPct = [math]::Round((1.0 - ($os.FreePhysicalMemory / $os.TotalVisibleMemorySize)) * 100.0, 0)
+        }
+    } catch { }
+    try {
         $cpu = Get-CimInstance Win32_Processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average
-        $cpuPct = [math]::Round($cpu.Average, 0)
-    } catch {}
+        if ($null -ne $cpu.Average) { $cpuPct = [math]::Round($cpu.Average, 0) }
+    } catch { }
     return @{ cpu = $cpuPct; ram = $ramPct }
 }
 
@@ -43,33 +115,40 @@ $port = 5050
 $url = "http://localhost:$port/"
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add($url)
-$listener.Start()
-
-Start-Process $url
-
-while ($listener.IsListening) {
-    $context = $listener.GetContext()
-    $req = $context.Request
-    $res = $context.Response
-
-    if ($req.Url.AbsolutePath -eq "/api/data") {
-        $data = Get-FastSnapshot
-        $json = ConvertTo-Json -InputObject $data
-        $buffer = [System.Text.Encoding]::UTF8.GetBytes($json)
-        $res.ContentType = "application/json"
-    } else {
-        $htmlPath = Join-Path $script:Root "interfaz.html"
-        if (Test-Path $htmlPath) {
-            # LA CORRECCIÓN CLAVE: Forzar a PowerShell a leer en UTF-8
-            $html = Get-Content -Raw -Path $htmlPath -Encoding UTF8
-            $buffer = [System.Text.Encoding]::UTF8.GetBytes($html)
-        } else {
-            $buffer = [System.Text.Encoding]::UTF8.GetBytes("Falta archivo interfaz.html")
+try {
+    $listener.Start()
+    Start-Process $url
+    while ($listener.IsListening) {
+        $context = $listener.GetContext()
+        $res = $context.Response
+        try {
+            if ($context.Request.Url.AbsolutePath -eq '/api/data') {
+                $data = Get-FastSnapshot
+                $json = ConvertTo-Json -InputObject $data -Compress
+                $buffer = [System.Text.Encoding]::UTF8.GetBytes($json)
+                $res.ContentType = 'application/json; charset=utf-8'
+                $res.Headers.Add('Cache-Control', 'no-store')
+            } else {
+                $htmlPath = Join-Path $script:Root 'interfaz.html'
+                if (Test-Path -LiteralPath $htmlPath) {
+                    # Codificacion UTF-8 necesaria para emojis y caracteres especiales.
+                    $html = Get-Content -Raw -Path $htmlPath -Encoding UTF8
+                } else {
+                    $html = 'Falta archivo interfaz.html'
+                }
+                $buffer = [System.Text.Encoding]::UTF8.GetBytes($html)
+                $res.ContentType = 'text/html; charset=utf-8'
+                $res.Headers.Add('Cache-Control', 'no-store')
+            }
+            $res.ContentLength64 = $buffer.Length
+            $res.OutputStream.Write($buffer, 0, $buffer.Length)
+        } catch {
+            Write-Warning ("Solicitud local: " + $_.Exception.Message)
+        } finally {
+            $res.Close()
         }
-        # LA CORRECCIÓN CLAVE: Decirle al navegador que use UTF-8
-        $res.ContentType = "text/html; charset=utf-8"
     }
-    $res.ContentLength64 = $buffer.Length
-    $res.OutputStream.Write($buffer, 0, $buffer.Length)
-    $res.Close()
+} finally {
+    if ($listener.IsListening) { $listener.Stop() }
+    $listener.Close()
 }
