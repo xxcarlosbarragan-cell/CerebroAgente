@@ -1,0 +1,6 @@
+Cerebro Agent 2.0 - prototipo supervisado
+Vigilancia ligera cada 2 minutos mientras la ventana esta abierta.
+Nuevo boton Investigar y proponer: realiza lectura detallada, genera hipotesis y archivo de propuestas, sin ejecutar reparaciones.
+Indicador de disco limitado a 0-100: no es medicion exacta de actividad, porque el contador bruto puede superar 100.
+NO incluye IA generativa, acceso remoto ni reparaciones automáticas.
+Primero cierra v1.0 y extrae v2.0 en otra carpeta. Ejecuta sin administrador.

@@ -1,0 +1,15 @@
+{
+  "origin": "Informe(2).txt aportado por el usuario",
+  "sample_time_local": "2026-11-05 20:17:17",
+  "os": "Windows 10 Home Single Language 10.0.19045",
+  "reported_ram_total_kb": 3950796,
+  "reported_ram_free_kb": 420392,
+  "disk_model": "WDC WD5000LPZX-60Z10T0",
+  "disk_media": "HDD",
+  "disk_size_bytes": 500107862016,
+  "c_free_bytes": 422864203776,
+  "disk_health_reported": "Healthy",
+  "smart_predict_failure": false,
+  "sysmain_reported": "Stopped",
+  "caution": "Informe historico, no se conoce actividad instantanea de disco ni se certifica estado fisico."
+}

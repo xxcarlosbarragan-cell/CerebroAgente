@@ -1,0 +1,108 @@
+﻿Diagnostico de solo lectura - 11/05/2026 20:17:17
+
+===== Sistema operativo =====
+
+
+Caption                : Microsoft Windows 10 Home Single Language
+Version                : 10.0.19045
+LastBootUpTime         : 02/11/2026 02:12:37 p. m.
+FreePhysicalMemory     : 420392
+TotalVisibleMemorySize : 3950796
+
+
+
+
+
+===== Discos fisicos =====
+
+
+FriendlyName      : WDC WD5000LPZX-60Z10T0
+HealthStatus      : Healthy
+OperationalStatus : OK
+MediaType         : HDD
+Size              : 500107862016
+
+
+
+
+
+===== Unidades =====
+
+DeviceID         Size    FreeSpace
+--------         ----    ---------
+C:       499397480448 422864203776
+
+
+
+
+===== Disco SMART estado general (si disponible) =====
+
+InstanceName                                                  PredictFailure Reason
+------------                                                  -------------- ------
+SCSI\Disk&Ven_WDC&Prod_WD5000LPZX-60Z10\4&2ca21566&0&000000_0          False      0
+
+
+
+
+===== Procesos por memoria =====
+
+ProcessName                Id        CPU WorkingSet64
+-----------                --        --- ------------
+msedge                   7612    227.875    414113792
+svchost                  5388  4255.8125    234156032
+msedge                  11416   49.21875    232349696
+MsMpEng                  4668 6738.34375    209498112
+msedge                   6836  12.015625    188968960
+msedge                   5280    143.625    159428608
+powershell               8676   6.515625    143642624
+explorer                 1372  26.953125    126296064
+msedge                   5264   1.359375    105013248
+Memory Compression       2500 270.171875     86327296
+msedge                   8200      1.375     71462912
+msedge                    828   0.484375     69025792
+StartMenuExperienceHost 12192   2.890625     68202496
+ShellExperienceHost      6524   0.703125     67936256
+Taskmgr                  7536  46.796875     57675776
+
+
+
+
+===== Procesos por tiempo acumulado CPU =====
+
+ProcessName          Id         CPU WorkingSet64
+-----------          --         --- ------------
+MsMpEng            4668 6738.390625    209723392
+svchost            5388 4256.046875    248188928
+System                4 1572.671875      1392640
+SearchIndexer      3896  662.484375     32370688
+lsass               912    421.6875     15048704
+Memory Compression 2500    270.1875     87728128
+svchost            2112   249.78125     15364096
+msedge             7612     227.875    414113792
+svchost            3832     178.625     28303360
+MoUsoCoreWorker    9840    157.0625     28356608
+msedge             5280     143.625    159428608
+dwm                7812   129.03125     42369024
+svchost            2128   114.15625     16875520
+svchost            1028     93.3125     14028800
+svchost             720   85.859375     27688960
+
+
+
+
+===== Estado de servicios =====
+
+Name       Status StartType
+----       ------ ---------
+SysMain   Stopped Automatic
+WinDefend Running Automatic
+wuauserv  Running    Manual
+
+
+
+
+===== Errores recientes de disco y almacenamiento (ultimos 7 dias) =====
+
+
+===== Resumen =====
+Este informe no certifica la salud del HDD. Si el disco continua al 100% o hay errores de almacenamiento, respaldar datos y evaluar SMART con herramienta especializada.

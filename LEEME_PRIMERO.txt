@@ -1,0 +1,73 @@
+CEREBRO AGENT 1.0 - GUIA RAPIDA PARA WINDOWS 10
+============================================
+
+QUE ES
+Una primera version REAL y local de tu trabajador digital: toma mediciones
+actuales, vigila RAM/actividad del disco cada 3 minutos mientras esta abierto,
+registra historial, explica diagnosticos habituales y exporta informes.
+No es todavia una IA generativa ni repara Windows por su cuenta.
+
+PARA TU HP 240 G8
+El informe original, del 05/11/2026 20:17, reporto:
+- Windows 10 Home Single Language (19045).
+- RAM total 3.77 GiB; RAM libre 0.40 GiB aprox. (410 MiB).
+- Disco mecanico WDC WD5000LPZX-60Z10T0 de 500 GB.
+- Aproximadamente 423 GB libres en C: (en GB decimales).
+- Estado general 'Healthy', SMART PredictFailure False.
+- SysMain detenido.
+Estos datos NO prueban que el HDD no tenga una falla.
+La lectura de CPU del informe original es ACUMULADA, no porcentaje instantaneo.
+
+INSTALACION SIN ADMINISTRADOR
+1. Guarda el ZIP y extráelo en una carpeta fija, por ejemplo Documentos\Cerebro Agent.
+2. Abre la carpeta y revisa CerebroAgent.ps1 y el archivo .cmd.
+3. Da doble clic en Iniciar_Cerebro_Agent.cmd.
+4. Veras una ventana con el estado de RAM y disco; pulsa Analizar ahora.
+5. Para responder dudas escribe: "disco", "memoria", "defender", "respaldo",
+   "reparar", "seguridad" o "ayuda".
+6. Para enviarme el resultado pulsa Crear informe y adjunta el TXT resultante.
+
+SI WINDOWS BLOQUEA LA DESCARGA
+Este iniciador ejecuta PowerShell con una excepcion TEMPORAL de politica
+-ExecutionPolicy Bypass PARA ESA INSTANCIA, no altera la politica permanente.
+NO lo abras si no reconoces los archivos o dudas de su integridad.
+La ejecucion de scripts sigue siendo un riesgo: puedes abrirlos con Bloc de notas.
+
+VIGILANCIA AUTOMATICA AL INICIAR SESION
+El boton "Iniciar con Windows" pide una confirmacion adicional y crea solo
+un acceso directo en la carpeta Inicio del usuario actual. No crea servicios,
+no da privilegios de administrador y no necesita Internet. Necesitas dejar
+Cerebro Agent abierto; al cerrar la ventana termina la vigilancia. Para quitar
+el inicio automatico utiliza el boton "Quitar inicio automatico".
+
+ACCIONES DISPONIBLES
+- Analizar ahora: lecturas de Windows y eventos recientes.
+- Detener/Reanudar vigilancia: intervalo 3 minutos.
+- Crear informe: crea TXT en %LOCALAPPDATA%\CerebroAgent\Informes.
+- Monitor de recursos / Administrador de tareas: abre herramientas de Windows.
+- Preguntar: respuestas locales por temas; NO es chat de IA general.
+
+LIMITACIONES Y SEGURIDAD
+- Ninguna modificacion de servicios, registro, arranque, discos o archivos
+  salvo escritura de historial y los accesos directos elegidos explicitamente.
+- No detiene Defender ni interrumpe actualizaciones ni procesos.
+- Un contador alto de disco aislado no significa averia; tres muestras altas
+  consecutivas disparan alerta de persistencia.
+- El agente no puede resolver daños fisicos del HDD ni instalar un SSD.
+- Sin permisos admin permanentes ni acceso a internet.
+- Puede mostrar datos del equipo o eventos personales en informes: revísalos
+  antes de compartirlos.
+- No es posible validar funcionamiento completo en tu Windows desde aqui;
+  el programa requiere prueba local antes de confiar en el monitoreo.
+
+WINDOWS 10
+Windows 10 termino su soporte general el 14/10/2025. Se recomienda
+verificar ESU (actualizaciones extendidas) o posibilidad de migracion.
+
+PRIMERA MISION
+1. Ejecuta Analizar ahora.
+2. Si el disco sigue al 100%, abre Monitor de recursos para ver el responsable.
+3. Usa Crear informe y compartelo en ChatGPT para un plan de reparacion
+   particular, previa aprobacion de cada cambio importante.
+
+ACTUALIZACION V2: Boton Investigar y proponer; solo lectura. Vigilancia cada 2 minutos. No prueba soluciones ni ejecuta cambios.
