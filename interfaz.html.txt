@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cerebro Agent Táctico</title>
+    <style>
+        body { background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); color: #f8fafc; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .dashboard { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border-radius: 30px; width: 90%; max-width: 900px; padding: 30px; text-align: center; }
+        .office-floor { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; position: relative; margin-top: 20px; }
+        .station { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; transition: 0.3s; }
+        .base { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; height: 120px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; }
+        .agent { font-size: 2.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 1s ease; opacity: 0; }
+        .agent.active { opacity: 1; }
+        button { margin-top: 20px; background: #3b82f6; color: white; border: none; padding: 15px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h2>Centro de Operaciones</h2>
+        <div class="office-floor">
+            <div class="station" id="stat-cpu"><h3>🧠 CPU</h3><h2 id="val-cpu" style="color:#38bdf8">--%</h2></div>
+            <div class="base">
+                <span>🏢 BASE</span>
+                <div class="agent" id="a1">🏃‍♂️</div><div class="agent" id="a2">🕵️‍♀️</div>
+            </div>
+            <div class="station" id="stat-ram"><h3>⚡ RAM</h3><h2 id="val-ram" style="color:#a78bfa">--%</h2></div>
+        </div>
+        <button id="btn" onclick="inspeccionar()">DELEGAR AGENTES A INSPECCIÓN</button>
+    </div>
+    <script>
+        async function inspeccionar() {
+            const btn = document.getElementById('btn'); btn.innerText = "INSPECCIONANDO..."; btn.disabled = true;
+            const a1 = document.getElementById('a1'), a2 = document.getElementById('a2');
+            a1.classList.add('active'); a2.classList.add('active');
+            
+            a1.style.transform = 'translate(-300%, -50%) scale(1.2)';
+            a2.style.transform = 'translate(200%, -50%) scale(1.2)';
+            document.getElementById('stat-cpu').style.background = 'rgba(56, 189, 248, 0.2)';
+            document.getElementById('stat-ram').style.background = 'rgba(167, 139, 250, 0.2)';
+
+            let data = { cpu: 'X', ram: 'X' };
+            try { const res = await fetch('/api/data'); data = await res.json(); } catch(e){}
+
+            setTimeout(() => {
+                document.getElementById('val-cpu').innerText = data.cpu + '%';
+                document.getElementById('val-ram').innerText = data.ram + '%';
+                
+                a1.style.transform = 'translate(-50%, -50%) scale(1)';
+                a2.style.transform = 'translate(-50%, -50%) scale(1)';
+                document.getElementById('stat-cpu').style.background = 'rgba(255,255,255,0.03)';
+                document.getElementById('stat-ram').style.background = 'rgba(255,255,255,0.03)';
+                
+                setTimeout(() => {
+                    a1.classList.remove('active'); a2.classList.remove('active');
+                    btn.innerText = "DELEGAR AGENTES A INSPECCIÓN"; btn.disabled = false;
+                }, 1000);
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
