@@ -2,6 +2,21 @@
 # PowerShell 5.1 / Windows 10+; se preservan las URLs y el contrato GET /api/data.
 $ErrorActionPreference = 'Stop'
 $script:Root = Split-Path -Parent $MyInvocation.MyCommand.Path
+$script:TestLocal = ($env:CEREBRO_PORTABLE_LOCAL_TEST -eq '1')
+$script:DriveRoot = [System.IO.Path]::GetPathRoot($script:Root)
+function Test-PortableDrive {
+    if ($script:TestLocal) { return $true }
+    try {
+        $device = New-Object System.IO.DriveInfo($script:DriveRoot)
+        return ($device.DriveType -eq [System.IO.DriveType]::Removable -and $device.IsReady)
+    } catch { return $false }
+}
+if (-not (Test-PortableDrive)) {
+    Write-Host 'Conecta una memoria USB y ejecuta Cerebro Agent desde ella.'
+    exit 2
+}
+$script:LastClient = [DateTime]::UtcNow
+$script:StopRequested = $false
 
 function Buscar-Actualizaciones {
     # Direcciones oficiales existentes: no modificar.
@@ -91,8 +106,8 @@ function Buscar-Actualizaciones {
     }
 }
 
-Buscar-Actualizaciones
-
+# OTA deshabilitada en portable: requiere autorizacion antes de actualizar.
+# Buscar-Actualizaciones
 # REGLA DE RENDIMIENTO: no consultar Win32_PerfFormattedData_PerfDisk_PhysicalDisk.
 # La lectura se limita a CPU y RAM, tal como en la version 2.2.
 function Get-FastSnapshot {
@@ -118,11 +133,28 @@ $listener.Prefixes.Add($url)
 try {
     $listener.Start()
     Start-Process $url
-    while ($listener.IsListening) {
-        $context = $listener.GetContext()
+    while ($listener.IsListening -and -not $script:StopRequested) {
+        if (-not (Test-PortableDrive)) { break }
+        if (([DateTime]::UtcNow - $script:LastClient).TotalSeconds -gt 120) { break }
+        $pending = $listener.BeginGetContext($null, $null)
+        while (-not $pending.AsyncWaitHandle.WaitOne(4000)) {
+            if (-not (Test-PortableDrive) -or
+                ([DateTime]::UtcNow - $script:LastClient).TotalSeconds -gt 120) {
+                $script:StopRequested = $true
+                break
+            }
+        }
+        if ($script:StopRequested) { $pending.AsyncWaitHandle.Close(); break }
+        $context = $listener.EndGetContext($pending)
+        $pending.AsyncWaitHandle.Close()
+        $script:LastClient = [DateTime]::UtcNow
         $res = $context.Response
         try {
-            if ($context.Request.Url.AbsolutePath -eq '/api/data') {
+            if ($context.Request.Url.AbsolutePath -eq '/api/stop' -and $context.Request.HttpMethod -eq 'POST') {
+                $script:StopRequested = $true
+                $buffer = [System.Text.Encoding]::UTF8.GetBytes('{"stopped":true}')
+                $res.ContentType = 'application/json; charset=utf-8'
+            } elseif ($context.Request.Url.AbsolutePath -eq '/api/data') {
                 $data = Get-FastSnapshot
                 $json = ConvertTo-Json -InputObject $data -Compress
                 $buffer = [System.Text.Encoding]::UTF8.GetBytes($json)
