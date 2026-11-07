@@ -84,10 +84,10 @@
 (()=>{
 const $=id=>document.getElementById(id), $$=sel=>[...document.querySelectorAll(sel)], KEY='cerebro-agent-v23',HKEY='cerebro-agent-v23-history';
 const workers=[{name:'Atlas',job:'Procesador · CPU',icon:'🧑‍💻',color:[.23,.84,.93]},{name:'Vega',job:'Memoria · RAM',icon:'👩‍💻',color:[.68,.54,.98]},{name:'Nexo',job:'Diagnóstico táctico',icon:'🧑‍🔬',color:[.39,.90,.72]},{name:'Luma',job:'Historial y tendencias',icon:'👩‍🔧',color:[.97,.76,.45]},{name:'Iris',job:'Alertas del sistema',icon:'🧑‍🚀',color:[.95,.53,.64]},{name:'Kiro',job:'Rendimiento visual',icon:'🧑‍🔧',color:[.34,.68,.99]},{name:'Nova',job:'Estado de conexión',icon:'👩‍🚀',color:[.99,.66,.53]},{name:'Orbe',job:'Consolidación de datos',icon:'🧑‍🏭',color:[.49,.84,.98]}];
-const defaults={team:3,cpuLimit:85,ramLimit:90,interval:10000,quality:'lite',motion:true,webgl:true};
+const defaults={team:3,cpuLimit:85,ramLimit:90,interval:30000,quality:'lite',motion:false,webgl:false};
 const safeGet=(key,def)=>{try{const v=JSON.parse(localStorage.getItem(key));return v??def}catch{return def}};
 let settings={...defaults,...safeGet(KEY,{})};const valid=(v,min,max,fallback)=>Number.isFinite(Number(v))?Math.max(min,Math.min(max,Number(v))):fallback;
-settings.team=[3,5,8].includes(Number(settings.team))?Number(settings.team):3;settings.cpuLimit=valid(settings.cpuLimit,50,99,85);settings.ramLimit=valid(settings.ramLimit,50,99,90);settings.interval=[4000,6000,10000].includes(Number(settings.interval))?Number(settings.interval):6000;settings.quality=['lite','balanced'].includes(settings.quality)?settings.quality:'balanced';settings.motion=Boolean(settings.motion);settings.webgl=Boolean(settings.webgl);
+settings.team=[3,5,8].includes(Number(settings.team))?Number(settings.team):3;settings.cpuLimit=valid(settings.cpuLimit,50,99,85);settings.ramLimit=valid(settings.ramLimit,50,99,90);settings.interval=[10000,30000,60000].includes(Number(settings.interval))?Number(settings.interval):30000;settings.quality=['lite','balanced'].includes(settings.quality)?settings.quality:'balanced';settings.motion=Boolean(settings.motion);settings.webgl=Boolean(settings.webgl);
 let history=safeGet(HKEY,[]);if(!Array.isArray(history))history=[];history=history.filter(x=>x&&typeof x.time==='string'&&Number.isFinite(x.cpu)&&x.cpu>=0&&x.cpu<=100&&Number.isFinite(x.ram)&&x.ram>=0&&x.ram<=100).slice(-720);
 const state={online:false,busy:false,last:null,streakCpu:0,streakRam:0,activeCpu:false,activeRam:false,events:[],page:'centro',started:Date.now(),tick:0,abort:null,auditEnds:0};
 const saveSettings=()=>{try{localStorage.setItem(KEY,JSON.stringify(settings))}catch{}};
@@ -151,5 +151,14 @@ let renderer=null;
 function init(){configureEvents();renderer=new Tactical3D($('scene-canvas'));syncSettingsUi();refreshHistory();refreshCharts();setConnection(false);eventLine('Interfaz 2.3 iniciada · monitoreo local preparado.');$('clock').textContent=timeString();setInterval(()=>{$('clock').textContent=timeString();if(state.auditEnds){$$('.agent-state').forEach(el=>{el.textContent='Inspeccionando';el.classList.add('working')})}else{$$('.agent-state').forEach(el=>{el.textContent='En espera';el.classList.remove('working')})}},700);fetchSample();resetPoll()}
 init();
 })();
+</script>
+
+<button type="button" id="portable-close" style="position:fixed;right:14px;bottom:12px;z-index:4000;padding:9px 14px;border:1px solid #6883a1;border-radius:12px;background:#112136;color:#fff;cursor:pointer">⏻ Cerrar Agent</button>
+<script>
+document.getElementById('portable-close').addEventListener('click',async()=>{
+ if(!confirm('¿Cerrar Cerebro Agent y liberar la memoria USB?'))return;
+ try{await fetch('/api/stop',{method:'POST',cache:'no-store',keepalive:true});}catch(e){}
+ document.body.innerHTML='<main style="padding:15vh 8%;font:18px system-ui;background:#080e18;color:white;min-height:100vh">Cerebro Agent detenido. Cierra esta pestaña y expulsa la USB desde Windows.</main>';
+});
 </script>
 </body></html>
