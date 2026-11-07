@@ -1,334 +1,155 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Cerebro Agent - Oficina Virtual</title>
-    <style>
-        :root {
-            --bg-dark: #09090b;
-            --glass-bg: rgba(24, 24, 27, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --cpu-glow: #38bdf8;
-            --ram-glow: #a78bfa;
-            --disk-glow: #10b981;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
-        
-        body { 
-            background: var(--bg-dark); 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            overflow: hidden;
-            color: white;
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Cerebro Agent 2.3 · Centro de operaciones</title>
+<style>
+:root{--bg:#080e18;--panel:#101b2b;--border:rgba(177,214,244,.13);--muted:#98adc3;--text:#edf6ff;--cyan:#5fe5e7;--purple:#ab92fd;--green:#61d9ae;--amber:#ffbf76;--red:#ff8d9a;--radius:23px;--soft-shadow:0 14px 38px rgba(0,0,0,.18)}
+*{box-sizing:border-box}html{background:#080e18;scroll-behavior:smooth}body{margin:0;font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--text);background:radial-gradient(ellipse 42rem 34rem at 53% -8%,rgba(36,93,138,.2),transparent 75%),linear-gradient(150deg,#07111e 0%,#091221 65%,#07101a);min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #83edff;outline-offset:3px}button:disabled{cursor:not-allowed;opacity:.6}svg{display:block}a{color:var(--cyan)}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:27px 16px;background:linear-gradient(165deg,rgba(15,28,44,.97),rgba(8,17,30,.94));border-right:1px solid var(--border)}.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 34px}.brandmark{height:42px;width:42px;border-radius:14px;display:grid;place-items:center;color:#b3ffff;background:linear-gradient(145deg,#1d7d95,#263c68);box-shadow:0 0 30px rgba(56,194,222,.17);font-size:23px}.brand b{font-size:17px;letter-spacing:-.6px}.brand small{display:block;color:var(--muted);letter-spacing:1.8px;font-size:9px;font-weight:700;margin-top:4px}.nav-label{color:#668299;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.6px;padding:0 13px 12px}.nav{display:grid;gap:6px}.nav button{width:100%;display:flex;align-items:center;gap:11px;text-align:left;color:#a4b6c9;padding:13px;border:1px solid transparent;border-radius:13px;background:transparent;font-size:13px;font-weight:650;transition:background .18s}.nav button.active{color:#ddfbff;border-color:rgba(91,219,234,.18);background:linear-gradient(90deg,rgba(38,129,149,.22),rgba(56,137,172,.06));box-shadow:inset 3px 0 var(--cyan)}.nav button:hover:not(.active){background:rgba(255,255,255,.045)}.nav .ico{font-size:19px;width:22px;text-align:center}.sidebar-footer{margin-top:auto;padding:15px 13px;border:1px solid var(--border);background:rgba(27,47,64,.3);border-radius:16px}.status-line{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:750}.dot{display:inline-block;width:8px;height:8px;border-radius:100%;background:#738398;box-shadow:0 0 0 3px rgba(131,151,171,.1)}.dot.good{background:var(--green);box-shadow:0 0 12px rgba(97,217,174,.5)}.dot.warn{background:var(--amber)}.dot.bad{background:var(--red)}.sidebar-footer p{font-size:11px;line-height:1.5;color:var(--muted);margin:8px 0 0}
+.main{padding:29px clamp(18px,3vw,48px) 44px;max-width:1720px;width:100%;margin:auto;min-width:0}.topline{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}.eyebrow{font-size:10px;letter-spacing:2.1px;text-transform:uppercase;color:var(--cyan);font-weight:800}.topline h1{font-size:clamp(26px,3vw,37px);letter-spacing:-1.4px;font-weight:760;line-height:1.11;margin:10px 0 9px}.subtitle{color:var(--muted);margin:0;font-size:13px;line-height:1.6}.righttop{display:flex;gap:10px;align-items:center}.badge{white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.2px;border:1px solid var(--border);background:rgba(25,42,62,.55);padding:11px 13px;border-radius:50px;color:#bdd0df;display:flex;gap:9px;align-items:center}.clock{color:#8eaabd;font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.statgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}.glass{background:linear-gradient(143deg,rgba(24,43,63,.72),rgba(13,24,39,.8));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--soft-shadow);backdrop-filter:blur(16px)}.stat{min-height:145px;padding:19px 22px;position:relative;overflow:hidden}.stat:before{content:"";position:absolute;right:-22px;top:-56px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(100,216,241,.10),transparent 65%);pointer-events:none}.stat.violet:before{background:radial-gradient(circle,rgba(171,146,253,.13),transparent 65%)}.stat .title{font-size:12px;letter-spacing:.2px;color:#9bb3c7;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}.title .sparklabel{font-size:10px;color:#62809a}.stat .value{font-variant-numeric:tabular-nums;font-size:38px;font-weight:770;letter-spacing:-1.7px;margin:11px 0 0}.unit{font-size:18px;color:#799cb4;margin-left:2px;font-weight:500}.stat .meta{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;margin-top:11px}.track{height:5px;border-radius:6px;background:rgba(120,170,195,.12);overflow:hidden;margin-top:13px}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),#74c4ff);border-radius:5px;transition:width .5s}.violet .fill{background:linear-gradient(90deg,#9d86f9,#ddafff)}.stat.warning .fill{background:var(--amber)}.stat.danger .fill{background:var(--red)}.stat .corner-icon{color:#87adc5;font-size:21px;opacity:.75}.stat .tiny{font-size:10px;letter-spacing:.7px;color:#6e93ab;text-transform:uppercase}
+.oper-grid{display:grid;grid-template-columns:minmax(0,1.74fr) minmax(286px,.78fr);gap:16px}.scene-card{overflow:hidden;min-height:475px;position:relative}.card-head{padding:20px 22px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;z-index:2}.card-head h2{font-size:15px;letter-spacing:-.25px;margin:0 0 4px}.card-head p{color:var(--muted);font-size:11px;margin:0;line-height:1.4}.pill-group{display:flex;align-items:center;padding:3px;border:1px solid rgba(160,206,238,.13);background:#0b1829;border-radius:11px;gap:2px}.pill-group button{border:0;border-radius:8px;background:transparent;color:#90adc2;font-size:11px;font-weight:800;padding:8px 11px;min-width:30px}.pill-group button.active{color:#dbffff;background:#225471;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.scene-wrap{height:358px;position:relative;margin:5px 12px 0;background:radial-gradient(ellipse 50% 50% at 50% 68%,rgba(29,102,123,.16),transparent 100%),linear-gradient(180deg,rgba(9,28,46,.42),rgba(5,16,28,.56));border:1px solid rgba(94,157,196,.09);border-radius:20px;overflow:hidden;touch-action:pan-y}.scene-wrap:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 95%,rgba(87,181,199,.045) 95%),linear-gradient(90deg,transparent 95%,rgba(87,181,199,.035) 95%);background-size:45px 45px;mask-image:linear-gradient(transparent 15%,black 100%);pointer-events:none}.scene-wrap:after{content:"";position:absolute;inset:0;box-shadow:inset 0 -50px 55px rgba(5,16,28,.32),inset 0 45px 45px rgba(5,16,28,.20);pointer-events:none}.scene-wrap canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:grab;touch-action:none}.scene-wrap canvas:active{cursor:grabbing}.scene-hud{position:absolute;left:18px;top:15px;z-index:3;display:flex;gap:7px}.tag{border:1px solid rgba(119,210,228,.19);background:rgba(10,29,45,.74);padding:7px 9px;border-radius:9px;color:#b0d5e0;font-size:10px;font-weight:750;backdrop-filter:blur(8px)}.tag .live{color:#6cefc5}.scene-caption{z-index:3;position:absolute;bottom:14px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:end;gap:10px;pointer-events:none}.scene-caption span{font-size:10px;color:#9ab8c9;display:block}.scene-caption strong{font-size:13px;font-weight:650}.scene-caption .hint{font-size:10px;color:#7290a3;text-align:right}.fallback{display:none;position:absolute;inset:0;z-index:1;place-items:center;text-align:center;color:#aac4d6}.fallback .fallback-icons{font-size:55px;letter-spacing:6px;filter:drop-shadow(0 0 16px rgba(93,231,238,.3))}.fallback p{font-size:12px;margin:15px}
+.scene-wrap.nogl canvas{display:none}.scene-wrap.nogl .fallback{display:block}
+.fallback{overflow:hidden;background:radial-gradient(ellipse at 50% 63%,rgba(42,132,163,.21),transparent 66%)}
+.fallback:before{content:"";position:absolute;top:40px;left:18%;right:18%;height:1px;background:linear-gradient(90deg,transparent,rgba(111,225,235,.38),transparent);box-shadow:0 0 55px 19px rgba(67,191,216,.075)}
+.fallback-floor{position:absolute;left:-20%;bottom:-43%;width:140%;height:100%;background:repeating-linear-gradient(90deg,transparent 0 45px,rgba(91,220,231,.10) 46px,transparent 47px),repeating-linear-gradient(0deg,transparent 0 40px,rgba(91,220,231,.10) 41px,transparent 42px),linear-gradient(0deg,rgba(20,59,79,.75),rgba(10,35,51,.08));transform:perspective(420px) rotateX(56deg);border-top:2px solid rgba(89,219,237,.28);mask-image:linear-gradient(transparent 0%,black 22%,black 90%)}
+.fallback-panel{position:absolute;left:50%;top:27%;transform:translateX(-50%);width:145px;height:85px;border:1px solid rgba(117,236,244,.23);border-radius:13px;background:linear-gradient(160deg,rgba(35,95,120,.34),rgba(13,32,51,.64));box-shadow:0 0 33px rgba(80,196,218,.16),inset 0 0 27px rgba(69,185,202,.07);display:flex;align-items:center;justify-content:center;color:#95dfea;font-size:22px;letter-spacing:5px;opacity:.7}
+.fallback-crew{position:absolute;left:10%;right:10%;bottom:63px;display:flex;justify-content:space-around;align-items:flex-end;gap:0;z-index:2;perspective:700px}
+.css-agent{--suit:#2991aa;--glow:#80e9f2;width:74px;height:164px;flex:none;position:relative;filter:drop-shadow(0 10px 13px rgba(0,0,0,.4));animation:css-idle 3s ease-in-out infinite}
+.css-agent:nth-child(2n){animation-delay:-1.25s}.css-agent:nth-child(3n){animation-delay:-2s}
+.css-agent .head{position:absolute;left:18px;top:5px;width:38px;height:41px;border-radius:46% 46% 41% 41%;background:linear-gradient(125deg,#a5c3d0 7%,#526b85 65%,#324457);border:2px solid rgba(198,243,250,.24);box-shadow:inset -7px -4px 13px rgba(15,22,47,.3),0 -3px 12px rgba(129,224,242,.08)}
+.css-agent .head:before{content:"";position:absolute;left:2px;right:2px;top:15px;height:12px;border-radius:7px;background:linear-gradient(90deg,#0d546f,var(--glow),#0c526a);box-shadow:0 0 12px var(--glow);opacity:.9}
+.css-agent .head:after{content:"";position:absolute;left:5px;right:5px;top:-2px;height:15px;border-radius:60% 60% 16% 16%;background:#1c3a4c}
+.css-agent .neck{position:absolute;left:29px;top:43px;width:17px;height:16px;border-radius:3px;background:#6e9dae}
+.css-agent .torso{position:absolute;left:14px;top:55px;width:46px;height:54px;background:linear-gradient(135deg,#557a92,var(--suit) 42%,#172c47);clip-path:polygon(14% 0,85% 0,100% 22%,84% 100%,18% 100%,0 20%);border-radius:8px;box-shadow:inset 2px 1px 15px rgba(255,255,255,.08)}
+.css-agent .torso:before{content:"";position:absolute;top:16px;left:16px;width:14px;height:21px;border:1px solid var(--glow);border-radius:4px;box-shadow:0 0 9px var(--glow);background:rgba(7,30,41,.55)}
+.css-agent .arm{position:absolute;top:61px;width:15px;height:52px;border-radius:9px;background:linear-gradient(90deg,#1c4257,var(--suit),#60798c);transform-origin:50% 12%}.css-agent .arm.left{left:5px;transform:rotate(13deg)}.css-agent .arm.right{right:5px;transform:rotate(-13deg)}
+.css-agent .leg{position:absolute;top:105px;width:20px;height:47px;border-radius:5px 5px 8px 8px;background:linear-gradient(90deg,#1b3851,#506b7d,#1d3650)}.css-agent .leg.left{left:17px}.css-agent .leg.right{right:17px}.css-agent .leg:after{content:"";position:absolute;bottom:-5px;width:25px;height:10px;left:-2px;border-radius:4px;background:#132d3e}
+.css-agent .shadow{position:absolute;bottom:-4px;left:5px;right:5px;height:7px;border-radius:50%;background:var(--glow);filter:blur(8px);opacity:.46}
+.scene-wrap.auditing .css-agent .arm.right{animation:css-inspect .42s ease-in-out infinite alternate}.css-agent .worker-name{position:absolute;left:50%;transform:translateX(-50%);bottom:-21px;font-size:10px;font-weight:750;letter-spacing:1px;color:#a8d2e4;text-shadow:0 0 8px rgba(35,148,171,.9)}
+.fallback-crew.crowded .css-agent{transform:scale(.80);margin:0 -5px}
+@keyframes css-inspect{from{transform:rotate(-13deg)}to{transform:rotate(-53deg)}}@keyframes css-idle{0%,100%{translate:0 0}50%{translate:0 -6px}}
+@media(max-width:650px){.css-agent{scale:.80;margin:0 -8px}.fallback-crew{left:0;right:0}.fallback-crew.crowded{left:5%;right:5%;bottom:54px;display:grid;grid-template-columns:repeat(4,1fr);justify-items:center;align-items:center;row-gap:0}.fallback-crew.crowded .css-agent{transform:scale(.58);width:50px;height:116px;transform-origin:center center;margin:0}.fallback-panel{top:20%}}
 
-        /* iOS Glass Dashboard Contenedor */
-        .dashboard {
-            width: 95%;
-            max-width: 1100px;
-            height: 85vh;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 40px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        /* Cabecera limpia iOS */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0 20px;
-        }
-        .header h1 { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.5px; }
-        .header p { color: #a1a1aa; font-size: 0.9rem; }
-
-        /* El Cuarto de la Oficina (Vista Top-Down 2.5D) */
-        .office-room {
-            flex-grow: 1;
-            background: linear-gradient(135deg, #18181b 0%, #0f0f12 100%);
-            border-radius: 30px;
-            border: 2px solid #27272a;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 20px 50px rgba(0,0,0,0.8);
-            /* Piso de oficina */
-            background-image: 
-                radial-gradient(rgba(255,255,255,0.05) 2px, transparent 2px),
-                radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 40px 40px, 20px 20px;
-        }
-
-        /* Elementos de Oficina (Decoración) */
-        .plant { position: absolute; font-size: 2.5rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); z-index: 2;}
-        .plant-1 { top: 20px; left: 20px; }
-        .plant-2 { bottom: 20px; right: 20px; transform: scaleX(-1); }
-        .water-cooler { position: absolute; font-size: 2.5rem; top: 20px; right: 30px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); z-index: 2;}
-
-        /* Estaciones de Trabajo (Servidores / Archivos) */
-        .station {
-            position: absolute;
-            background: rgba(39, 39, 42, 0.8);
-            border-top: 3px solid rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 15px;
-            width: 180px;
-            height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 -5px 15px rgba(0,0,0,0.5);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 5;
-        }
-
-        /* Sombra base 3D de los servidores */
-        .station::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            width: 70%;
-            height: 10px;
-            background: rgba(0,0,0,0.6);
-            filter: blur(5px);
-            border-radius: 50%;
-        }
-
-        /* Posiciones en el mapa */
-        .station.cpu { top: 15%; left: 12%; border-bottom: 2px solid var(--cpu-glow); }
-        .station.ram { top: 15%; right: 12%; border-bottom: 2px solid var(--ram-glow); }
-        .station.disk { bottom: 10%; left: 12%; width: 220px; border-bottom: 2px solid var(--disk-glow); }
-
-        .station h3 { font-size: 0.9rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;}
-        .station-value { font-size: 1.8rem; font-weight: 700; margin-top: 5px; font-variant-numeric: tabular-nums; }
-        
-        .station.cpu .station-value { color: var(--cpu-glow); text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
-        .station.ram .station-value { color: var(--ram-glow); text-shadow: 0 0 15px rgba(167, 139, 250, 0.4); }
-        .station.disk .station-value { color: var(--disk-glow); text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
-
-        /* Escritorio Central (BASE) */
-        .home-base {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 240px;
-            height: 120px;
-            background: #27272a;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 5px 10px rgba(255,255,255,0.1);
-            border-bottom: 5px solid #18181b;
-            z-index: 5;
-        }
-        
-        /* Detalles sobre el escritorio (Laptops, café, documentos) */
-        .home-base::before {
-            content: '💻 ☕ 📋';
-            font-size: 1.5rem;
-            position: absolute;
-            top: 20px;
-            letter-spacing: 15px;
-            opacity: 0.8;
-        }
-
-        /* Agentes */
-        .agent {
-            font-size: 2.5rem;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -20px; 
-            margin-left: -20px;
-            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 10;
-            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.4));
-        }
-
-        /* Panel lateral / UI superpuesta flotante */
-        .action-panel {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 25px;
-            border-radius: 24px;
-            z-index: 20;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        button {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        button:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 15px 25px rgba(255,255,255,0.3);
-        }
-
-        button:disabled {
-            background: #3f3f46;
-            color: #a1a1aa;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Efectos visuales de inspección (Neón parpadeando) */
-        .scanning {
-            animation: pulse-glow 1s infinite alternate;
-        }
-        @keyframes pulse-glow {
-            from { box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 -5px 15px rgba(0,0,0,0.5), 0 0 0px transparent; }
-            to { box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 -5px 15px rgba(0,0,0,0.5), 0 0 35px currentColor; }
-        }
-    </style>
+.scene-foot{display:flex;justify-content:space-between;align-items:center;padding:13px 19px 18px;gap:12px;flex-wrap:wrap}.scene-foot .small{font-size:11px;color:var(--muted)}.scenectrl{display:flex;gap:7px}.mini-btn{background:rgba(60,98,120,.19);color:#bfd5e2;border:1px solid rgba(145,193,223,.16);border-radius:10px;padding:9px 11px;font-size:11px;font-weight:700}.mini-btn:hover{background:rgba(81,143,166,.21)}.primary{background:linear-gradient(115deg,#6de8e8,#a0f5de);color:#06232e;border:1px solid #a4fff6;border-radius:12px;padding:12px 17px;font-size:12px;font-weight:820;box-shadow:0 7px 22px rgba(89,226,234,.13)}.primary:hover{filter:brightness(1.06)}
+.sidepanel{padding:20px 20px 17px;display:flex;flex-direction:column;min-height:475px}.sidepanel h2{font-size:15px;margin:0 0 5px}.sidepanel .lead{font-size:11px;color:var(--muted);margin:0 0 18px}.alertbox{padding:14px;border:1px solid rgba(129,174,204,.14);background:rgba(10,26,40,.6);border-radius:14px;min-height:90px}.alertbox .alerttitle{font-size:12px;font-weight:750;display:flex;align-items:center;gap:9px;margin-bottom:7px}.alertbox p{color:#92a9b9;font-size:11px;line-height:1.5;margin:0}.alertbox.warn{border-color:rgba(255,191,118,.35)}.alertbox.bad{border-color:rgba(255,141,154,.3)}.divider{height:1px;background:var(--border);margin:19px 0}.linehead{display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:11px}.muted{color:var(--muted)}.team-mini{display:grid;gap:10px;max-height:166px;overflow:auto}.agent-row{display:flex;align-items:center;gap:10px;min-width:0}.agent-avatar{width:34px;height:34px;flex:none;border:1px solid rgba(160,226,232,.15);border-radius:11px;display:grid;place-items:center;background:linear-gradient(130deg,rgba(77,156,183,.22),rgba(84,76,139,.24));font-size:17px}.agent-text{flex:1;min-width:0}.agent-text b{display:block;font-size:11px}.agent-text small{display:block;font-size:10px;color:#7e98af;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.agent-state{font-size:10px;font-weight:700;color:#7faaa9;white-space:nowrap}.agent-state.working{color:var(--cyan)}.actionstack{display:grid;grid-template-columns:1fr;gap:8px;margin-top:auto;padding-top:14px}.actionstack .primary{width:100%;display:flex;align-items:center;justify-content:center;gap:9px}.text-note{font-size:10px;color:#7893a6;text-align:center;margin:0}
+.bottomgrid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(260px,.92fr);gap:16px;margin-top:16px}.chartbox,.logbox{padding:19px 21px;min-height:208px}.sectiontitle{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:13px}.sectiontitle h2{font-size:14px;margin:0}.sectiontitle small{color:var(--muted);font-size:10px}.chart{width:100%;height:128px;display:block}.legend{display:flex;gap:15px;align-items:center;font-size:10px;color:#8ba9be;margin-top:7px}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--cyan)}.legend .purple{background:var(--purple)}.log-list{list-style:none;margin:0;padding:0;display:grid;gap:12px;max-height:150px;overflow:auto}.log-list li{font-size:11px;color:#b0c2d2;line-height:1.45;display:flex;gap:9px;align-items:baseline}.log-list time{font-size:10px;color:#607f95;white-space:nowrap;font-variant-numeric:tabular-nums}
+.page{display:none}.page.active{display:block}.inner-head{margin-bottom:18px}.inner-head h2{font-size:20px;letter-spacing:-.4px;margin:0 0 6px}.inner-head p{font-size:12px;color:var(--muted);margin:0}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.detail-card{padding:22px}.detail-card h3{font-size:14px;margin:0 0 10px}.detail-card p{font-size:12px;color:var(--muted);line-height:1.7;margin:0}.detail-card .big{font-size:34px;font-weight:770;letter-spacing:-1px;margin:10px 0}.note{padding:15px 17px;background:rgba(86,157,172,.085);border:1px solid rgba(115,187,206,.16);border-radius:14px;color:#b2cbda;font-size:12px;line-height:1.6;margin-top:16px}.table-wrap{overflow:auto}.data-table{width:100%;border-collapse:collapse;text-align:left;font-size:12px}.data-table th{color:#94abc0;font-size:10px;letter-spacing:.5px;text-transform:uppercase;font-weight:800;padding:11px 12px;border-bottom:1px solid var(--border)}.data-table td{padding:12px;border-bottom:1px solid rgba(173,207,227,.07);color:#c0d3e1;font-variant-numeric:tabular-nums}.buttonrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.person-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:13px}.person-card{padding:17px;display:flex;gap:12px;align-items:center}.person-card b{font-size:13px}.person-card small{color:var(--muted);display:block;font-size:11px;line-height:1.5;margin-top:5px}.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 0;border-bottom:1px solid var(--border)}.setting strong{font-size:13px}.setting small{display:block;font-size:11px;color:var(--muted);margin-top:6px;max-width:470px;line-height:1.5}.setting input[type=number],.setting select{background:#0c1b2b;color:var(--text);border:1px solid rgba(157,200,230,.24);padding:10px;border-radius:10px;max-width:120px}.setting input[type=checkbox]{width:19px;height:19px;accent-color:#62dfec}.notice-stack{display:grid;gap:8px;margin-top:16px}
+@media(max-width:1150px){.shell{grid-template-columns:190px minmax(0,1fr)}.main{padding:25px 18px}.oper-grid{grid-template-columns:minmax(0,1fr) 285px}.scene-wrap{height:318px}.scene-card,.sidepanel{min-height:430px}}@media(max-width:960px){.sidebar{position:relative;height:auto;padding:15px 18px 9px;grid-column:1/-1;display:flex;flex-direction:row;align-items:center;gap:15px;border-right:none;border-bottom:1px solid var(--border)}.shell{display:block}.sidebar .brand{padding:0;min-width:150px}.nav-label,.sidebar-footer{display:none}.nav{display:flex;overflow:auto;gap:3px}.nav button{white-space:nowrap;padding:10px 12px}.main{padding:22px}.oper-grid{grid-template-columns:1fr}.sidepanel{min-height:auto}.sidepanel .team-mini{grid-template-columns:repeat(3,minmax(0,1fr));max-height:none}.actionstack{max-width:260px}.scene-wrap{height:370px}}@media(max-width:630px){.sidebar{display:block}.brand{padding-bottom:12px!important}.nav button{font-size:0;justify-content:center;width:50px;height:44px}.nav button .ico{font-size:20px}.topline{align-items:flex-start}.righttop{flex-direction:column;align-items:flex-end}.clock{display:none}.main{padding:18px 13px 33px}.statgrid{gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:16px;min-height:132px}.stat:last-child{grid-column:1/-1;min-height:100px}.stat .value{font-size:30px}.stat .meta{margin-top:8px}.stat:last-child .track{display:none}.scene-card{min-height:0}.scene-wrap{height:315px;margin:7px}.scene-foot{padding:12px}.scene-foot .small{flex-basis:100%}.bottomgrid,.detail-grid{grid-template-columns:1fr}.scene-caption .hint{display:none}.sidepanel .team-mini{grid-template-columns:1fr 1fr}.badge{font-size:10px;padding:9px}.card-head{padding:16px}.person-grid{grid-template-columns:1fr}.setting{align-items:flex-start}.setting input[type=number]{width:75px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-
-    <div class="dashboard">
-        <div class="header">
-            <div>
-                <h1>Centro de Operaciones Táctico</h1>
-                <p>Monitoreo local en tiempo real</p>
-            </div>
-            <div style="background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
-                <span style="color: #4ade80;">●</span> Sistema en línea
-            </div>
-        </div>
-
-        <div class="office-room" id="office">
-            <!-- Decoración de la Oficina -->
-            <div class="plant plant-1">🪴</div>
-            <div class="plant plant-2">🪴</div>
-            <div class="water-cooler">🚰</div>
-
-            <!-- Servidores / Archiveros -->
-            <div class="station cpu" id="stat-cpu" style="color: var(--cpu-glow)">
-                <span style="font-size: 2.5rem;">🖥️</span>
-                <h3>Procesador</h3>
-                <div class="station-value" id="val-cpu">--%</div>
-            </div>
-
-            <div class="station ram" id="stat-ram" style="color: var(--ram-glow)">
-                <span style="font-size: 2.5rem;">🗄️</span>
-                <h3>Memoria RAM</h3>
-                <div class="station-value" id="val-ram">--%</div>
-            </div>
-
-            <div class="station disk" id="stat-disk" style="color: var(--disk-glow)">
-                <span style="font-size: 2.5rem;">🗃️</span>
-                <h3>Almacenamiento (C:)</h3>
-                <div class="station-value" id="val-disk">--%</div>
-            </div>
-
-            <!-- Escritorio Central y Agentes -->
-            <div class="home-base">
-                <div class="agent" id="a1">🧑‍💻</div>
-                <div class="agent" id="a2">👩‍💻</div>
-            </div>
-
-            <!-- Panel de Control Flotante -->
-            <div class="action-panel">
-                <p style="color: #a1a1aa; font-size: 0.85rem; margin-bottom: 12px; font-weight: 600; letter-spacing: 1px;">CONTROL DE AGENTES</p>
-                <button id="btn" onclick="inspeccionar()">
-                    <span>🚀</span> Iniciar Auditoría
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        async function inspeccionar() {
-            const btn = document.getElementById('btn');
-            btn.innerHTML = "<span>⏳</span> Analizando red...";
-            btn.disabled = true;
-
-            const a1 = document.getElementById('a1');
-            const a2 = document.getElementById('a2');
-            const statCpu = document.getElementById('stat-cpu');
-            const statRam = document.getElementById('stat-ram');
-            const statDisk = document.getElementById('stat-disk');
-            
-            // Calculamos el tamaño de la oficina dinámicamente para que caminen exacto a los servidores
-            const office = document.getElementById('office');
-            const rect = office.getBoundingClientRect();
-            
-            // Animación 1: Los agentes salen del escritorio hacia el CPU y RAM (Arriba)
-            a1.style.transform = `translate(-${rect.width * 0.3}px, -${rect.height * 0.25}px) scale(1.1)`;
-            a2.style.transform = `translate(${rect.width * 0.3}px, -${rect.height * 0.25}px) scale(1.1)`;
-            
-            // Se encienden las luces de neón
-            statCpu.classList.add('scanning');
-            statRam.classList.add('scanning');
-
-            let data = { cpu: 'Err', ram: 'Err' };
-            try { 
-                const res = await fetch('/api/data'); 
-                data = await res.json(); 
-            } catch(e){ console.error("Sin conexión al servidor"); }
-
-            setTimeout(() => {
-                // Actualizan pantallas
-                document.getElementById('val-cpu').innerText = data.cpu + '%';
-                document.getElementById('val-ram').innerText = data.ram + '%';
-                
-                // Regresan a la base a dejar su reporte
-                a1.style.transform = 'translate(0, 0) scale(1)';
-                a2.style.transform = 'translate(0, 0) scale(1)';
-                statCpu.classList.remove('scanning');
-                statRam.classList.remove('scanning');
-                
-                setTimeout(() => {
-                    // Animación 2: El agente 1 va al archivo del Disco Duro (Abajo)
-                    a1.style.transform = `translate(-${rect.width * 0.25}px, ${rect.height * 0.3}px) scale(1.1)`;
-                    statDisk.classList.add('scanning');
-                    
-                    setTimeout(() => {
-                        // Imprime el valor
-                        document.getElementById('val-disk').innerText = "OK";
-                        
-                        setTimeout(() => {
-                            // Regresa a sentarse en la base
-                            a1.style.transform = 'translate(0, 0) scale(1)';
-                            statDisk.classList.remove('scanning');
-                            
-                            setTimeout(() => {
-                                btn.innerHTML = "<span>🚀</span> Iniciar Auditoría";
-                                btn.disabled = false;
-                            }, 800);
-                        }, 800);
-                    }, 800);
-                }, 800);
-            }, 1200);
-        }
-    </script>
-</body>
-</html>
+<div class="shell">
+<aside class="sidebar" aria-label="Navegación principal">
+ <div class="brand"><div class="brandmark" aria-hidden="true">◈</div><div><b>Cerebro<span style="color:var(--cyan)">Agent</span></b><small>TACTICAL SYSTEM · V2.3</small></div></div>
+ <div class="nav-label">Panel de control</div>
+ <nav class="nav" aria-label="Secciones">
+ <button type="button" class="active" data-page="centro" aria-current="page"><span class="ico" aria-hidden="true">◫</span> Centro de operaciones</button>
+ <button type="button" data-page="diagnostico"><span class="ico" aria-hidden="true">◉</span> Diagnóstico táctico</button>
+ <button type="button" data-page="historial"><span class="ico" aria-hidden="true">⌁</span> Historial y métricas</button>
+ <button type="button" data-page="equipo"><span class="ico" aria-hidden="true">♟</span> Equipo de agentes</button>
+ <button type="button" data-page="ajustes"><span class="ico" aria-hidden="true">⚙</span> Configuración</button>
+ </nav>
+ <div class="sidebar-footer"><div class="status-line"><span class="dot" id="side-dot"></span><span id="side-status">Conectando...</span></div><p>Servidor de telemetría local<br>localhost:5050 · Solo CPU y RAM</p></div>
+</aside>
+<main class="main">
+ <header class="topline"><div><div class="eyebrow">CEREBRO / SISTEMA OPERATIVO</div><h1 id="page-title">Centro de operaciones</h1><p class="subtitle" id="page-subtitle">Tu estación táctica de monitoreo, análisis y coordinación visual.</p></div><div class="righttop"><span class="clock" id="clock">--:--:--</span><span class="badge"><span class="dot" id="top-dot"></span><span id="top-status">Conectando</span></span></div></header>
+ <section class="statgrid" aria-label="Telemetría actual">
+  <article class="glass stat" id="cpu-card"><div class="title"><span>Procesador · CPU</span><span class="corner-icon" aria-hidden="true">◈</span></div><div class="value"><span id="cpu-value">--</span><span class="unit">%</span></div><div class="track" role="progressbar" aria-label="Uso de CPU" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="cpu-track"><div class="fill" id="cpu-fill"></div></div><div class="meta"><span id="cpu-meta">Esperando telemetría local</span></div></article>
+  <article class="glass stat violet" id="ram-card"><div class="title"><span>Memoria · RAM</span><span class="corner-icon" aria-hidden="true">▣</span></div><div class="value"><span id="ram-value">--</span><span class="unit">%</span></div><div class="track" role="progressbar" aria-label="Uso de RAM" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ram-track"><div class="fill" id="ram-fill"></div></div><div class="meta"><span id="ram-meta">Esperando telemetría local</span></div></article>
+  <article class="glass stat"><div class="title"><span>Estado observado</span><span class="corner-icon" aria-hidden="true">◇</span></div><div class="value" style="font-size:24px;margin:19px 0 5px;letter-spacing:-.4px" id="overall-value">Sin datos</div><div class="meta" id="overall-meta">Basado exclusivamente en CPU y RAM</div></article>
+ </section>
+ <section class="page active" id="page-centro">
+  <div class="oper-grid">
+   <article class="glass scene-card"><div class="card-head"><div><h2>Oficina táctica · visualización 3D</h2><p>Trabajadores holográficos · representación visual</p></div><div class="pill-group" aria-label="Número de trabajadores"><button type="button" data-count="3" class="active">3</button><button type="button" data-count="5">5</button><button type="button" data-count="8">8</button></div></div>
+    <div class="scene-wrap" id="scene"><canvas id="scene-canvas" aria-label="Oficina tridimensional con avatares de trabajadores" role="img"></canvas><div class="fallback" aria-label="Representación ligera del equipo de trabajadores"><div class="fallback-floor"></div><div class="fallback-panel" aria-hidden="true">◇ ◈ ◇</div><div class="fallback-crew" id="fallback-crew"></div></div><div class="scene-hud"><span class="tag"><span class="live">●</span> RENDER LOCAL</span><span class="tag" id="fps-indicator">3D · -- FPS</span></div><div class="scene-caption"><div><span>ESTACIÓN DE TRABAJO</span><strong id="scene-caption-text">Equipo en espera de instrucciones</strong></div><span class="hint">Arrastra para girar la cámara</span></div></div>
+    <div class="scene-foot"><span class="small">Modo de visualización: <b id="quality-label" style="color:#bdd5e2">equilibrado</b></span><div class="scenectrl"><button type="button" class="mini-btn" id="orbit-btn" title="Restablecer cámara">↻ Cámara</button><button type="button" class="mini-btn" id="scene-toggle">◉ 3D activo</button></div></div>
+   </article>
+   <article class="glass sidepanel"><h2>Centro de diagnóstico</h2><p class="lead">Alertas y estado de los agentes de monitoreo</p><div class="alertbox" id="main-alert" aria-live="polite"><div class="alerttitle" id="alert-title"><span>◯</span> Esperando lecturas</div><p id="alert-body">Se mostrarán avisos cuando exista información real.</p></div><div class="divider"></div><div class="linehead"><span>TRABAJADORES ACTIVOS EN ESCENA</span><span class="muted" id="team-count-label">3 / 8</span></div><div class="team-mini" id="team-mini"></div><div class="actionstack"><button type="button" class="primary" id="audit-btn">✦ Iniciar auditoría</button><p class="text-note" id="audit-hint">Consulta bajo demanda · Sin modificar tu PC</p></div></article>
+  </div>
+  <div class="bottomgrid"><article class="glass chartbox"><div class="sectiontitle"><h2>Actividad en tiempo real</h2><small id="chart-subtitle">Últimas lecturas disponibles</small></div><canvas class="chart" id="live-chart" aria-label="Gráfica de CPU y RAM en el tiempo" role="img"></canvas><div class="legend"><span><i></i>CPU</span><span><i class="purple"></i>RAM</span><span style="margin-left:auto" id="samples-label">0 lecturas</span></div></article><article class="glass logbox"><div class="sectiontitle"><h2>Bitácora de eventos</h2><small>Sesión actual</small></div><ul class="log-list" id="event-list" aria-live="polite"><li>La bitácora comienza al abrir esta interfaz.</li></ul></article></div>
+ </section>
+ <section class="page" id="page-diagnostico"><div class="inner-head"><h2>Diagnóstico táctico</h2><p>Lecturas reales del endpoint /api/data y evaluación local mediante umbrales.</p></div><div class="detail-grid"><article class="glass detail-card"><h3>🖥️ Carga del procesador</h3><div class="big" id="diag-cpu">--%</div><p id="diag-cpu-text">Esperando datos válidos.</p></article><article class="glass detail-card"><h3>🧠 Memoria operativa</h3><div class="big" id="diag-ram">--%</div><p id="diag-ram-text">Esperando datos válidos.</p></article><article class="glass detail-card"><h3>💽 Estado de disco</h3><div class="big" style="font-size:21px">Sin telemetría</div><p>Los contadores físicos de disco permanecen desactivados. No se afirma que el disco esté sano ni que esté fallando.</p></article><article class="glass detail-card"><h3>🛰️ Servidor local</h3><div class="big" style="font-size:21px" id="diag-server">Sin conexión</div><p id="diag-server-text">El backend debe estar ejecutándose en localhost:5050. No se consulta ningún servicio de IA ni de nube.</p></article></div><div class="note" id="recommendation">Las recomendaciones aparecerán después de recibir muestras suficientes. Esta aplicación no ejecuta reparaciones ni modificaciones de Windows.</div></section>
+ <section class="page" id="page-historial"><div class="inner-head"><h2>Historial y métricas</h2><p>Se conserva en este navegador un máximo de 720 muestras válidas. No hay registros compartidos con servidores externos.</p></div><article class="glass chartbox"><div class="sectiontitle"><h2>Tendencia de uso de recursos</h2><div class="buttonrow"><button type="button" class="mini-btn" id="export-json">Exportar JSON</button><button type="button" class="mini-btn" id="export-csv">Exportar CSV</button><button type="button" class="mini-btn" id="clear-history">Vaciar historial</button></div></div><canvas class="chart" style="height:220px" id="history-chart" aria-label="Historial de valores de CPU y RAM" role="img"></canvas><div class="legend"><span><i></i>CPU</span><span><i class="purple"></i>RAM</span><span style="margin-left:auto" id="history-count">0 muestras</span></div></article><article class="glass detail-card" style="margin-top:14px"><h3>Últimas muestras registradas</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha / hora local</th><th>CPU</th><th>RAM</th><th>Origen</th></tr></thead><tbody id="history-rows"><tr><td colspan="4">Sin registros</td></tr></tbody></table></div></article></section>
+ <section class="page" id="page-equipo"><div class="inner-head"><h2>Equipo de trabajadores 3D</h2><p>Elige cuántos se representan en escena. Sus roles son visuales, no agentes autónomos ni procesos reales.</p></div><div class="glass detail-card"><div class="sectiontitle"><h2>Personal en escena</h2><div class="pill-group" aria-label="Cantidad de trabajadores"><button type="button" data-count="3" class="active">3</button><button type="button" data-count="5">5</button><button type="button" data-count="8">8</button></div></div><div class="person-grid" id="people-grid"></div></div><div class="note">Los movimientos de auditoría son animaciones representativas. Las mediciones se realizan únicamente mediante el backend PowerShell ya existente.</div></section>
+ <section class="page" id="page-ajustes"><div class="inner-head"><h2>Configuración</h2><p>Preferencias guardadas en este navegador, sin modificar archivos del sistema.</p></div><article class="glass detail-card"><div class="setting"><div><strong>Alerta CPU (%)</strong><small>Umbral de carga alta para generar un aviso sostenido.</small></div><input type="number" id="cpu-limit" min="50" max="99" step="1" value="85" aria-label="Umbral de CPU"></div><div class="setting"><div><strong>Alerta RAM (%)</strong><small>Umbral de memoria utilizada.</small></div><input type="number" id="ram-limit" min="50" max="99" step="1" value="90" aria-label="Umbral de RAM"></div><div class="setting"><div><strong>Intervalo de monitoreo</strong><small>Evita sobrecargar el servidor y permite observar las variaciones.</small></div><select id="poll-interval" aria-label="Intervalo de monitoreo"><option value="10000">Cada 10 segundos</option><option value="30000">Cada 30 segundos</option><option value="60000">Cada 60 segundos</option></select></div><div class="setting"><div><strong>Calidad de visualización</strong><small>Modo ligero recomendado si el equipo tiene recursos limitados.</small></div><select id="quality-select" aria-label="Calidad 3D"><option value="lite">Ligero · 12 FPS</option><option value="balanced">Equilibrado · 20 FPS</option></select></div><div class="setting"><div><strong>Movimiento de personajes</strong><small>Desactiva las animaciones continuas, respetando accesibilidad.</small></div><input type="checkbox" id="motion-switch" checked aria-label="Permitir movimientos"></div><div class="setting"><div><strong>Escena tridimensional</strong><small>Se puede reemplazar por una representación de bajo consumo.</small></div><input type="checkbox" id="webgl-switch" checked aria-label="Habilitar 3D"></div><div class="setting"><div><strong>Limpiar preferencias</strong><small>Restablece los parámetros de visualización y alerta. No elimina el historial.</small></div><button type="button" class="mini-btn" id="reset-settings">Restablecer</button></div></article></section>
+</main></div>
+<script>
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id), $$=sel=>[...document.querySelectorAll(sel)], KEY='cerebro-agent-v23',HKEY='cerebro-agent-v23-history';
+const workers=[{name:'Atlas',job:'Procesador · CPU',icon:'🧑‍💻',color:[.23,.84,.93]},{name:'Vega',job:'Memoria · RAM',icon:'👩‍💻',color:[.68,.54,.98]},{name:'Nexo',job:'Diagnóstico táctico',icon:'🧑‍🔬',color:[.39,.90,.72]},{name:'Luma',job:'Historial y tendencias',icon:'👩‍🔧',color:[.97,.76,.45]},{name:'Iris',job:'Alertas del sistema',icon:'🧑‍🚀',color:[.95,.53,.64]},{name:'Kiro',job:'Rendimiento visual',icon:'🧑‍🔧',color:[.34,.68,.99]},{name:'Nova',job:'Estado de conexión',icon:'👩‍🚀',color:[.99,.66,.53]},{name:'Orbe',job:'Consolidación de datos',icon:'🧑‍🏭',color:[.49,.84,.98]}];
+const defaults={team:3,cpuLimit:85,ramLimit:90,interval:30000,quality:'lite',motion:false,webgl:false};
+const safeGet=(key,def)=>{try{const v=JSON.parse(localStorage.getItem(key));return v??def}catch{return def}};
+let settings={...defaults,...safeGet(KEY,{})};const valid=(v,min,max,fallback)=>Number.isFinite(Number(v))?Math.max(min,Math.min(max,Number(v))):fallback;
+settings.team=[3,5,8].includes(Number(settings.team))?Number(settings.team):3;settings.cpuLimit=valid(settings.cpuLimit,50,99,85);settings.ramLimit=valid(settings.ramLimit,50,99,90);settings.interval=[10000,30000,60000].includes(Number(settings.interval))?Number(settings.interval):30000;settings.quality=['lite','balanced'].includes(settings.quality)?settings.quality:'lite';settings.motion=Boolean(settings.motion);settings.webgl=Boolean(settings.webgl);
+let history=safeGet(HKEY,[]);if(!Array.isArray(history))history=[];history=history.filter(x=>x&&typeof x.time==='string'&&Number.isFinite(x.cpu)&&x.cpu>=0&&x.cpu<=100&&Number.isFinite(x.ram)&&x.ram>=0&&x.ram<=100).slice(-720);
+const state={online:false,busy:false,last:null,streakCpu:0,streakRam:0,activeCpu:false,activeRam:false,events:[],page:'centro',started:Date.now(),tick:0,abort:null,auditEnds:0};
+const saveSettings=()=>{try{localStorage.setItem(KEY,JSON.stringify(settings))}catch{}};
+let lastHistorySaveAt=0;const saveHistory=(force=false)=>{const now=Date.now();if(!force&&now-lastHistorySaveAt<30000)return;try{localStorage.setItem(HKEY,JSON.stringify(history));lastHistorySaveAt=now}catch{}};
+const timeString=(date=new Date())=>date.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function eventLine(text){state.events.unshift({at:new Date(),text});state.events=state.events.slice(0,12);$('event-list').replaceChildren(...state.events.slice(0,6).map(e=>{const li=document.createElement('li');const time=document.createElement('time');time.textContent=timeString(e.at);const message=document.createElement('span');message.textContent=e.text;li.append(time,message);return li}))}
+function setConnection(on){const old=state.online;state.online=on;if(!on){state.streakCpu=0;state.streakRam=0;state.activeCpu=false;state.activeRam=false;}for(const id of ['side-dot','top-dot'])$(id).className='dot '+(on?'good':'bad');$('side-status').textContent=on?'Telemetría disponible':'Sin conexión local';$('top-status').textContent=on?'Servidor conectado':'Servidor no disponible';$('diag-server').textContent=on?'Conectado':'Sin conexión';$('diag-server-text').textContent=on?'Lecturas desde GET /api/data en el servidor PowerShell local.':'Inicia el archivo CMD en tu equipo Windows y abre http://localhost:5050.';if(old!==on)eventLine(on?'Conexión con el servidor establecida.':'No se reciben datos del servidor local.');updateAlert()}
+function textSafe(v){return Number.isFinite(v)?Math.round(v)+'%':'--%'}
+function updateMetric(which,value,limit){$(which+'-value').textContent=Math.round(value);$(which+'-fill').style.width=value+'%';$(which+'-track').setAttribute('aria-valuenow',value);$(which+'-meta').textContent=value>=limit?'Por encima del umbral configurado':'Lectura reciente · fuente local';$(which+'-card').classList.toggle('warning',value>=limit);$('diag-'+which).textContent=textSafe(value)}
+function updateAlert(){const box=$('main-alert');box.classList.remove('warn','bad');let title='Sin telemetría',desc='No se puede evaluar CPU y RAM hasta conectar el servidor.';if(state.online&&state.last){if(state.activeCpu||state.activeRam){box.classList.add('bad');title='Uso elevado sostenido';desc=[state.activeCpu?'CPU':'',state.activeRam?'RAM':''].filter(Boolean).join(' y ')+' superó el umbral durante al menos 3 lecturas consecutivas. Revisa los procesos abiertos.';}else if(state.last.cpu>=settings.cpuLimit||state.last.ram>=settings.ramLimit){box.classList.add('warn');title='Lectura elevada · observando';desc='Se esperan 3 muestras consecutivas antes de confirmar una alerta sostenida.';}else{title='Sin alertas activas';desc='CPU y RAM están por debajo de los umbrales definidos en esta lectura.'}}$('alert-title').textContent=(state.online?'◉ ':'◯ ')+title;$('alert-body').textContent=desc;$('overall-value').textContent=!state.online?'Sin datos':state.activeCpu||state.activeRam?'Atención':state.last&&Math.max(state.last.cpu,state.last.ram)>=Math.min(settings.cpuLimit,settings.ramLimit)?'En observación':'Estable';$('overall-meta').textContent=state.online?'Evaluación limitada a CPU y RAM':'Sin lectura de salud del sistema';$('recommendation').textContent=!state.online?'Conecta el servidor local para iniciar el diagnóstico. No se ejecutan modificaciones del sistema.':state.activeCpu?'La CPU registra carga alta sostenida. Revisa el Administrador de tareas y cierra solo aplicaciones que reconozcas, si procede.':state.activeRam?'La RAM registra uso alto sostenido. Comprueba aplicaciones y pestañas abiertas. No se recomiendan cierres automáticos.':'No se detectó uso elevado sostenido en las métricas disponibles. Esto no descarta problemas de disco, energía, temperatura u otros componentes.'}
+function onSample(sample){state.last=sample;const cpuHigh=sample.cpu>=settings.cpuLimit,ramHigh=sample.ram>=settings.ramLimit;state.streakCpu=cpuHigh?Math.min(3,state.streakCpu+1):0;state.streakRam=ramHigh?Math.min(3,state.streakRam+1):0;const prevCpu=state.activeCpu,prevRam=state.activeRam;state.activeCpu=state.streakCpu>=3;state.activeRam=state.streakRam>=3;if(state.activeCpu&&!prevCpu)eventLine('Alerta: CPU elevada durante 3 lecturas.');if(state.activeRam&&!prevRam)eventLine('Alerta: RAM elevada durante 3 lecturas.');if(prevCpu&&!state.activeCpu)eventLine('CPU vuelve bajo el umbral.');if(prevRam&&!state.activeRam)eventLine('RAM vuelve bajo el umbral.');updateMetric('cpu',sample.cpu,settings.cpuLimit);updateMetric('ram',sample.ram,settings.ramLimit);$('diag-cpu-text').textContent=cpuHigh?'Carga superior al umbral configurado. Confirma si se mantiene.':'Uso dentro del umbral configurado en esta lectura.';$('diag-ram-text').textContent=ramHigh?'Memoria utilizada por encima del umbral.':'Uso de RAM dentro del umbral configurado.';history.push(sample);history=history.slice(-720);saveHistory();updateAlert();refreshCharts();refreshHistory();$('chart-subtitle').textContent='Actualización '+timeString(new Date(sample.time))}
+function numericPct(v){if((typeof v==='number'||typeof v==='string'&&v.trim()!=='')&&Number.isFinite(Number(v))&&Number(v)>=0&&Number(v)<=100)return Number(v);return null}
+async function fetchSample({manual=false}={}){if(state.busy)return false;if(document.hidden&&!manual)return false;state.busy=true;const ctrl=new AbortController();state.abort=ctrl;const timeout=setTimeout(()=>ctrl.abort(),3000);try{const res=await fetch('/api/data',{method:'GET',cache:'no-store',signal:ctrl.signal});if(!res.ok)throw Error('HTTP '+res.status);const data=await res.json(),cpu=numericPct(data?.cpu),ram=numericPct(data?.ram);if(cpu===null||ram===null)throw Error('Telemetría no válida');setConnection(true);onSample({time:new Date().toISOString(),cpu,ram,source:'local'});return true}catch(e){setConnection(false);if(manual)eventLine('La auditoría no obtuvo lecturas válidas.');return false}finally{clearTimeout(timeout);state.abort=null;state.busy=false}}
+async function runAudit(){const btn=$('audit-btn');if(btn.disabled)return;btn.disabled=true;btn.textContent='◌ Auditando...';state.auditEnds=performance.now()+2600;$('scene').classList.add('auditing');eventLine('Auditoría manual iniciada: CPU y RAM.');$('scene-caption-text').textContent='Trabajadores inspeccionando las estaciones';const okay=await fetchSample({manual:true});if(okay)eventLine('Auditoría completada: datos actualizados.');await new Promise(resolve=>setTimeout(resolve,settings.motion?1500:120));state.auditEnds=0;$('scene').classList.remove('auditing');$('scene-caption-text').textContent=okay?'Auditoría terminada · estaciones en espera':'Auditoría sin respuesta del servidor';btn.disabled=false;btn.textContent='✦ Iniciar auditoría'}
+function renderTeam(){for(const b of $$('[data-count]')){const active=Number(b.dataset.count)===settings.team;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))}$('team-count-label').textContent=settings.team+' / 8';const cards=workers.slice(0,settings.team);
+ const fallback=$('fallback-crew');fallback.classList.toggle('crowded',settings.team>=8);fallback.replaceChildren(...cards.map(w=>{const el=document.createElement('div');el.className='css-agent';el.style.setProperty('--suit',`rgb(${w.color.map(c=>Math.round(c*145)).join(',')})`);el.style.setProperty('--glow',`rgb(${w.color.map(c=>Math.round(c*255)).join(',')})`);el.innerHTML='<div class=shadow></div><div class="leg left"></div><div class="leg right"></div><div class="arm left"></div><div class="arm right"></div><div class=torso></div><div class=neck></div><div class=head></div><div class=worker-name>'+w.name+'</div>';return el}));
+ $('team-mini').replaceChildren(...cards.map((w,i)=>{const el=document.createElement('div');el.className='agent-row';el.innerHTML='<span class="agent-avatar" aria-hidden="true">'+w.icon+'</span><span class="agent-text"><b>'+w.name+'</b><small>'+w.job+'</small></span><span class="agent-state" id="state-'+i+'">En espera</span>';return el}));$('people-grid').replaceChildren(...workers.map((w,i)=>{const el=document.createElement('div');el.className='glass person-card';el.innerHTML='<div class="agent-avatar" style="width:50px;height:50px;font-size:24px" aria-hidden="true">'+w.icon+'</div><div><b>'+w.name+(i<settings.team?' · en escena':' · disponible')+'</b><small>'+w.job+'</small></div>';return el}));}
+function syncSettingsUi(){$('cpu-limit').value=settings.cpuLimit;$('ram-limit').value=settings.ramLimit;$('poll-interval').value=settings.interval;$('quality-select').value=settings.quality;$('motion-switch').checked=settings.motion;$('webgl-switch').checked=settings.webgl;$('quality-label').textContent=settings.quality==='lite'?'ligero':'equilibrado';$('scene-toggle').textContent=!renderer?.available?'◯ WebGL no disponible':settings.webgl?'◉ 3D activo':'◯ Vista ligera';$('scene-toggle').disabled=!renderer?.available;$('fps-indicator').textContent=!renderer?.available?'2D · modo ligero':settings.webgl?'3D · activo':'2D · modo ligero';$('scene').classList.toggle('nogl',!settings.webgl||!renderer?.available);renderTeam()}
+function navigate(page){if(!['centro','diagnostico','historial','equipo','ajustes'].includes(page))return;state.page=page;$$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));$$('.nav button').forEach(b=>{const active=b.dataset.page===page;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});const names={centro:'Centro de operaciones',diagnostico:'Diagnóstico táctico',historial:'Historial y métricas',equipo:'Equipo de agentes',ajustes:'Configuración'};$('page-title').textContent=names[page];if(page==='centro'||page==='historial')requestAnimationFrame(refreshCharts);if(page==='historial')refreshHistory()}
+const chartDefaults={cpu:'#60dce9',ram:'#ad93ff'};
+function drawChart(id,rows){const canvas=$(id);if(!canvas||!canvas.getClientRects().length)return;const rect=canvas.getBoundingClientRect();if(rect.width<10)return;const dpr=Math.min(devicePixelRatio||1,2),w=rect.width,h=rect.height;canvas.width=Math.floor(w*dpr);canvas.height=Math.floor(h*dpr);const ctx=canvas.getContext('2d');if(!ctx)return;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const margin={top:8,right:9,bottom:10,left:18},pw=w-margin.left-margin.right,ph=h-margin.top-margin.bottom;ctx.strokeStyle='rgba(168,197,216,.11)';ctx.lineWidth=1;ctx.fillStyle='#69859d';ctx.font='10px Segoe UI, sans-serif';for(const p of [0,25,50,75,100]){const y=margin.top+(100-p)/100*ph;ctx.beginPath();ctx.moveTo(margin.left,y);ctx.lineTo(w-margin.right,y);ctx.stroke();if(p===0||p===50||p===100)ctx.fillText(String(p),0,y+3)}if(rows.length<2){ctx.fillStyle='#728da4';ctx.font='12px Segoe UI, sans-serif';ctx.textAlign='center';ctx.fillText('Esperando al menos 2 lecturas reales',w/2,h/2);ctx.textAlign='left';return}for(const key of ['cpu','ram']){ctx.beginPath();rows.forEach((r,i)=>{const x=margin.left+i/(rows.length-1)*pw,y=margin.top+(100-r[key])/100*ph;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=chartDefaults[key];ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();const last=rows[rows.length-1];ctx.beginPath();ctx.arc(w-margin.right,margin.top+(100-last[key])/100*ph,3,0,Math.PI*2);ctx.fillStyle=chartDefaults[key];ctx.fill()}}
+function refreshCharts(){drawChart('live-chart',history.slice(-60));drawChart('history-chart',history.slice(-180));$('samples-label').textContent=history.length+' lecturas';$('history-count').textContent=history.length+' muestras'}
+function refreshHistory(){const tbody=$('history-rows');if(!history.length){tbody.innerHTML='<tr><td colspan="4">Sin registros</td></tr>';return}tbody.replaceChildren(...history.slice(-15).reverse().map(h=>{const tr=document.createElement('tr');for(const v of [new Date(h.time).toLocaleString('es-MX'),textSafe(h.cpu),textSafe(h.ram),'Servidor local']){const td=document.createElement('td');td.textContent=v;tr.append(td)}return tr}))}
+function downloadFile(name,blob){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function exportData(format){const stamp=new Date().toISOString().slice(0,10);if(format==='json')downloadFile('CerebroAgent_historial_'+stamp+'.json',new Blob([JSON.stringify({app:'Cerebro Agent',version:'2.3',scope:'CPU/RAM',exportedAt:new Date().toISOString(),samples:history},null,2)],{type:'application/json;charset=utf-8'}));else{const lines=['timestamp,cpu_percent,ram_percent,source',...history.map(r=>`${r.time},${r.cpu},${r.ram},local`)];downloadFile('CerebroAgent_historial_'+stamp+'.csv',new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}))}eventLine('Historial exportado en '+format.toUpperCase()+'.')}
+function configureEvents(){for(const b of $$('.nav button'))b.addEventListener('click',()=>navigate(b.dataset.page));for(const b of $$('[data-count]'))b.addEventListener('click',()=>{settings.team=Number(b.dataset.count);saveSettings();renderTeam();eventLine('Escena ajustada a '+settings.team+' trabajadores visuales.')});$('audit-btn').addEventListener('click',runAudit);$('orbit-btn').addEventListener('click',()=>renderer?.resetCamera());$('scene-toggle').addEventListener('click',()=>{settings.webgl=!settings.webgl;saveSettings();syncSettingsUi()});$('export-json').addEventListener('click',()=>exportData('json'));$('export-csv').addEventListener('click',()=>exportData('csv'));$('clear-history').addEventListener('click',()=>{if(!confirm('¿Vaciar el historial de CPU y RAM guardado en este navegador?'))return;history=[];saveHistory(true);refreshCharts();refreshHistory();eventLine('Historial local eliminado.')} );for(const [id,key] of [['cpu-limit','cpuLimit'],['ram-limit','ramLimit']])$(id).addEventListener('change',e=>{settings[key]=valid(e.target.value,50,99,defaults[key]);e.target.value=settings[key];state.streakCpu=0;state.streakRam=0;state.activeCpu=false;state.activeRam=false;saveSettings();updateAlert()});$('poll-interval').addEventListener('change',e=>{settings.interval=Number(e.target.value);saveSettings();resetPoll()});$('quality-select').addEventListener('change',e=>{settings.quality=e.target.value;saveSettings();syncSettingsUi()});for(const [id,key] of [['motion-switch','motion'],['webgl-switch','webgl']])$(id).addEventListener('change',e=>{settings[key]=e.target.checked;saveSettings();syncSettingsUi()});$('reset-settings').addEventListener('click',()=>{settings={...defaults};saveSettings();syncSettingsUi();resetPoll();eventLine('Preferencias restablecidas.')});window.addEventListener('pagehide',()=>saveHistory(true));window.addEventListener('resize',()=>{refreshCharts();renderer?.resize()},{passive:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden){fetchSample();refreshCharts()}})}
+let pollTimer=null;function resetPoll(){if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(()=>fetchSample(),settings.interval)}
+/* Motor WebGL1 autocontenido. Avatares 3D geométricos y articulados: sin CDN ni archivos nuevos. */
+class Tactical3D{
+ constructor(canvas){this.canvas=canvas;this.available=false;this.yaw=0.22;this.pitch=.30;this.drag=false;this.width=0;this.height=0;this.lastFrame=0;this.frames=0;this.fpsLast=performance.now();this.fps=0;try{const gl=canvas.getContext('webgl',{alpha:true,antialias:false,powerPreference:'low-power',preserveDrawingBuffer:false})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL no disponible');this.gl=gl;this.initialize();this.available=true;this.pointerSetup();this.resize();}catch(err){console.warn('Cerebro Agent: modo visual ligero.',err.message);this.available=false;}$('scene').classList.toggle('nogl',!this.available||!settings.webgl);if(this.available)requestAnimationFrame(this.animate.bind(this))}
+ shader(type,source){const g=this.gl,s=g.createShader(type);g.shaderSource(s,source);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS))throw Error(g.getShaderInfoLog(s));return s}
+ initialize(){const g=this.gl,vert=`attribute vec3 aPos; attribute vec3 aNorm; uniform mat4 uMvp;uniform mat4 uModel;varying vec3 vNorm;varying vec3 vWorld;void main(){vec4 p=uModel*vec4(aPos,1.0);vWorld=p.xyz;vNorm=normalize(mat3(uModel)*aNorm);gl_Position=uMvp*vec4(aPos,1.0);}`,frag=`precision mediump float;uniform vec3 uColor;uniform float uGlow;varying vec3 vNorm;varying vec3 vWorld;void main(){vec3 n=normalize(vNorm);float l=max(dot(n,normalize(vec3(-0.35,0.85,0.65))),0.0);float rim=pow(1.0-max(dot(n,vec3(0.0,0.2,0.96)),0.0),2.4);vec3 color=uColor*(0.38+0.63*l)+uColor*rim*0.18+uColor*uGlow*0.44;float fog=clamp((length(vWorld.xz)-4.5)*0.08,0.0,0.32);gl_FragColor=vec4(mix(color,vec3(0.025,0.075,0.12),fog),1.0);}`;const program=g.createProgram();g.attachShader(program,this.shader(g.VERTEX_SHADER,vert));g.attachShader(program,this.shader(g.FRAGMENT_SHADER,frag));g.linkProgram(program);if(!g.getProgramParameter(program,g.LINK_STATUS))throw Error(g.getProgramInfoLog(program));g.useProgram(program);this.prg=program;this.attrs={pos:g.getAttribLocation(program,'aPos'),norm:g.getAttribLocation(program,'aNorm')};this.uniforms={mvp:g.getUniformLocation(program,'uMvp'),model:g.getUniformLocation(program,'uModel'),color:g.getUniformLocation(program,'uColor'),glow:g.getUniformLocation(program,'uGlow')};this.meshes={box:this.createMesh(this.box()),sphere:this.createMesh(this.sphere(10,8)),cylinder:this.createMesh(this.cylinder(10))};g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.disable(g.CULL_FACE);}
+ createMesh(mesh){const g=this.gl;const buffer=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buffer);g.bufferData(g.ARRAY_BUFFER,new Float32Array(mesh.vertices),g.STATIC_DRAW);const ind=g.createBuffer();g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,ind);g.bufferData(g.ELEMENT_ARRAY_BUFFER,new Uint16Array(mesh.indices),g.STATIC_DRAW);return{buffer,indices:ind,count:mesh.indices.length}}
+ box(){const v=[],idx=[],faces=[[[0,0,1],[-.5,-.5,.5],[.5,-.5,.5],[.5,.5,.5],[-.5,.5,.5]],[[0,0,-1],[.5,-.5,-.5],[-.5,-.5,-.5],[-.5,.5,-.5],[.5,.5,-.5]],[[1,0,0],[.5,-.5,.5],[.5,-.5,-.5],[.5,.5,-.5],[.5,.5,.5]],[[-1,0,0],[-.5,-.5,-.5],[-.5,-.5,.5],[-.5,.5,.5],[-.5,.5,-.5]],[[0,1,0],[-.5,.5,.5],[.5,.5,.5],[.5,.5,-.5],[-.5,.5,-.5]],[[0,-1,0],[-.5,-.5,-.5],[.5,-.5,-.5],[.5,-.5,.5],[-.5,-.5,.5]]];for(let i=0;i<faces.length;i++){const [n,...corners]=faces[i];for(const p of corners)v.push(...p,...n);const o=i*4;idx.push(o,o+1,o+2,o,o+2,o+3)}return{vertices:v,indices:idx}}
+ sphere(seg,rings){const v=[],indices=[];for(let y=0;y<=rings;y++){const phi=y/rings*Math.PI;for(let x=0;x<=seg;x++){const theta=x/seg*Math.PI*2,n=[Math.sin(phi)*Math.cos(theta),Math.cos(phi),Math.sin(phi)*Math.sin(theta)];v.push(...n,...n)}}for(let y=0;y<rings;y++)for(let x=0;x<seg;x++){const a=y*(seg+1)+x,b=a+seg+1;indices.push(a,b,a+1,b,b+1,a+1)}return{vertices:v,indices}}
+ cylinder(sides){const v=[],indices=[];for(let i=0;i<=sides;i++){const a=i/sides*Math.PI*2,x=Math.cos(a),z=Math.sin(a);for(let y of [-.5,.5])v.push(x*.5,y,z*.5,x,0,z)}for(let i=0;i<sides;i++){const o=i*2;indices.push(o,o+1,o+2,o+1,o+3,o+2)}return{vertices:v,indices}}
+ mat(...v){return new Float32Array(v)}
+ identity(){return this.mat(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)}
+ mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o}
+ trs(x,y,z,sx,sy,sz,rot=0){const c=Math.cos(rot),s=Math.sin(rot);return this.mat(c*sx,0,-s*sx,0,0,sy,0,0,s*sz,0,c*sz,0,x,y,z,1)}
+ perspective(fovy,aspect,near,far){const f=1/Math.tan(fovy/2),nf=1/(near-far);return this.mat(f/aspect,0,0,0,0,f,0,0,0,0,(far+near)*nf,-1,0,0,2*far*near*nf,0)}
+ lookAt(eye,target){const norm=v=>{const len=Math.hypot(...v)||1;return v.map(a=>a/len)},sub=(a,b)=>a.map((v,i)=>v-b[i]),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);const z=norm(sub(eye,target)),x=norm(cross([0,1,0],z)),y=cross(z,x);return this.mat(x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1)}
+ draw(mesh,x,y,z,sx,sy,sz,color,glow=0,rot=0){const g=this.gl,m=this.trs(x,y,z,sx,sy,sz,rot),mvp=this.mul(this.vp,m),b=this.meshes[mesh];g.uniformMatrix4fv(this.uniforms.mvp,false,mvp);g.uniformMatrix4fv(this.uniforms.model,false,m);g.uniform3fv(this.uniforms.color,color);g.uniform1f(this.uniforms.glow,glow);g.bindBuffer(g.ARRAY_BUFFER,b.buffer);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,b.indices);g.enableVertexAttribArray(this.attrs.pos);g.enableVertexAttribArray(this.attrs.norm);g.vertexAttribPointer(this.attrs.pos,3,g.FLOAT,false,24,0);g.vertexAttribPointer(this.attrs.norm,3,g.FLOAT,false,24,12);g.drawElements(g.TRIANGLES,b.count,g.UNSIGNED_SHORT,0)}
+ beam(a,b,thick,color,glow=0){const d=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],len=Math.hypot(...d);if(!len)return;const y=d.map(v=>v/len),helper=Math.abs(y[1])>.95?[1,0,0]:[0,1,0],cross=(p,q)=>[p[1]*q[2]-p[2]*q[1],p[2]*q[0]-p[0]*q[2],p[0]*q[1]-p[1]*q[0]],norm=v=>v.map(n=>n/(Math.hypot(...v)||1)),x=norm(cross(helper,y)),z=cross(x,y),mid=a.map((v,i)=>(v+b[i])/2),model=this.mat(x[0]*thick,x[1]*thick,x[2]*thick,0,y[0]*len,y[1]*len,y[2]*len,0,z[0]*thick,z[1]*thick,z[2]*thick,0,...mid,1),g=this.gl,m=this.meshes.cylinder;g.uniformMatrix4fv(this.uniforms.mvp,false,this.mul(this.vp,model));g.uniformMatrix4fv(this.uniforms.model,false,model);g.uniform3fv(this.uniforms.color,color);g.uniform1f(this.uniforms.glow,glow);g.bindBuffer(g.ARRAY_BUFFER,m.buffer);g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,m.indices);g.vertexAttribPointer(this.attrs.pos,3,g.FLOAT,false,24,0);g.vertexAttribPointer(this.attrs.norm,3,g.FLOAT,false,24,12);g.drawElements(g.TRIANGLES,m.count,g.UNSIGNED_SHORT,0)}
+ resize(){if(!this.available)return;const box=this.canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,settings.quality==='lite'?1:1.25),w=Math.max(1,Math.round(box.width*dpr)),h=Math.max(1,Math.round(box.height*dpr));if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;this.gl.viewport(0,0,w,h)}this.width=w;this.height=h}
+ pointerSetup(){let start=null;this.canvas.addEventListener('pointerdown',e=>{this.drag=true;start={x:e.clientX,y:e.clientY};this.canvas.setPointerCapture(e.pointerId)});this.canvas.addEventListener('pointermove',e=>{if(!this.drag||!start)return;this.yaw=Math.max(-.93,Math.min(.93,this.yaw+(e.clientX-start.x)*.005));this.pitch=Math.max(.10,Math.min(.8,this.pitch+(e.clientY-start.y)*.003));start={x:e.clientX,y:e.clientY}});const done=()=>{this.drag=false;start=null};this.canvas.addEventListener('pointerup',done);this.canvas.addEventListener('pointercancel',done);}
+ resetCamera(){this.yaw=.22;this.pitch=.30}
+ animate(now){requestAnimationFrame(this.animate.bind(this));if(document.hidden||!settings.webgl||state.page!=='centro')return;const fps=settings.quality==='lite'||settings.team>=8||state.last?.cpu>=85?12:20;if(now-this.lastFrame<1000/fps)return;this.lastFrame=now;this.resize();this.paint(now);this.frames++;if(now-this.fpsLast>1500){this.fps=Math.round(this.frames*1000/(now-this.fpsLast));this.frames=0;this.fpsLast=now;$('fps-indicator').textContent='3D · '+this.fps+' FPS'}}
+ paint(now){const g=this.gl;g.clearColor(.015,.047,.074,0);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);const a=this.yaw,elev=.38+this.pitch,radius=12,eye=[Math.sin(a)*radius,elev*10,Math.cos(a)*radius],view=this.lookAt(eye,[0,.6,0]),projection=this.perspective(.77,this.width/Math.max(1,this.height),.1,50);this.vp=this.mul(projection,view);const metal=[.075,.19,.28],base=[.05,.11,.18],line=[.08,.34,.4],bright=[.20,.67,.72];
+ // Superficie arquitectónica isométrica, acentos de luz y estaciones.
+ this.draw('box',0,-.25,0,10.2,.35,6.3,[.045,.12,.18]);this.draw('box',0,-.065,0,10.05,.035,6.18,[.078,.16,.22]);for(let x=-5;x<=5;x+=1.0)this.draw('box',x,-.038,0,.012,.007,6.1,line,.2);for(let z=-3;z<=3;z+=1)this.draw('box',0,-.038,z,10,.006,.012,line,.2);this.draw('box',0,.1,-2.96,9.9,.18,.10,[.13,.36,.43],.6);this.draw('box',0,.10,2.98,9.9,.13,.10,[.12,.33,.4],.6);
+ const spots=this.spots();for(let i=0;i<settings.team;i++){const p=spots[i];const x=p[0],z=p[1]-.65,c=workers[i].color;this.draw('box',x,.32,z,1.23,.11,.67,metal);this.draw('box',x-.49,.13,z,.08,.42,.07,base);this.draw('box',x+.49,.13,z,.08,.42,.07,base);this.draw('box',x,.85,z-.22,.73,.49,.065,[.045,.12,.19]);this.draw('box',x,.86,z-.175,.64,.39,.015,c,.30);this.draw('box',x,.64,z-.23,.075,.14,.08,base);this.draw('box',x,.30,z+.26,.54,.025,.18,[.16,.24,.29]);this.draw('box',x,.43,z+.01,.25,.012,.15,c,.34)}
+ // Centro de mando volumétrico.
+ this.draw('cylinder',0,.2,-.12,1.6,.3,1.6,[.13,.25,.32]);this.draw('cylinder',0,.39,-.12,1.65,.06,1.65,bright,.65);this.draw('cylinder',0,.49,-.12,1.3,.08,1.3,[.07,.24,.31]);this.draw('sphere',0,.80,-.12,.28,.28,.28,[.26,.87,.93],.9);
+ for(let i=0;i<settings.team;i++)this.worker(i,spots[i],now);}
+ spots(){if(settings.team===3)return[[-3.12,.8],[0,1.7],[3.12,.8]];if(settings.team===5)return[[-3.9,.7],[-1.85,1.65],[0,.95],[1.85,1.65],[3.9,.7]];return[[-3.85,.95],[-1.45,1.0],[1.45,1.0],[3.85,.95],[-3.6,2.30],[-1.2,2.30],[1.2,2.30],[3.6,2.3]]}
+ worker(i,spot,now){const c=workers[i].color,t=now*.001,anim=settings.motion&&!matchMedia('(prefers-reduced-motion: reduce)').matches;const audit=state.auditEnds>now;const wave=anim?Math.sin(t*1.8+i*1.9):0;let x=spot[0],z=spot[1],bob=anim?Math.sin(t*1.6+i)*.045:0;if(audit&&anim){const q=Math.sin((1-(state.auditEnds-now)/2600)*Math.PI);x+=Math.sin(i*2.2)*q*.17;z-=.29*q}const suit=[c[0]*.64+.11,c[1]*.58+.12,c[2]*.62+.14],shadow=[.05,.12,.20],silver=[.46,.63,.72];const y=bob;this.draw('cylinder',x,.07,z,.63,.06,.63,c,.24);this.draw('sphere',x,.13,z,.42,.06,.27,[.08,.21,.26]);this.draw('sphere',x,1.45+y,z,.48,.55,.29,suit);this.draw('box',x,1.42+y,z+.27,.38,.48,.075,shadow);this.draw('box',x,1.44+y,z+.317,.27,.08,.024,c,.9);this.draw('sphere',x,2.09+y,z,.35,.39,.33,[.61,.69,.72]);this.draw('sphere',x,2.20+y,z-.06,.355,.28,.34,[.10,.19,.30]);this.draw('box',x,2.09+y,z+.288,.54,.17,.065,[.10,.58,.67],1.2);this.draw('box',x,1.77+y,z,.19,.12,.18,silver);
+ for(const side of [-1,1]){const sh=[x+side*.4,1.65+y,z],el=[x+side*(.55+.05*wave),1.22+y,z+.05],hand=[x+side*(.49+.10*wave),.98+y,z+.18+(audit?.13:0)];this.beam(sh,el,.33,suit);this.beam(el,hand,.24,[.44,.57,.64]);this.draw('sphere',...hand,.14,.14,.14,[.54,.68,.7]);const hip=[x+side*.20,.98+y,z],knee=[x+side*.24,.54+y,z+wave*.045],foot=[x+side*.22,.18+y,z+.10];this.beam(hip,knee,.31,[.21,.32,.42]);this.beam(knee,foot,.26,silver);this.draw('box',x+side*.22,.12+y,z+.20,.28,.18,.42,[.10,.21,.29]);}}
+}
+let renderer=null;
+function init(){configureEvents();renderer=new Tactical3D($('scene-canvas'));syncSettingsUi();refreshHistory();refreshCharts();setConnection(false);eventLine('Interfaz 2.3 iniciada · monitoreo local preparado.');$('clock').textContent=timeString();setInterval(()=>{$('clock').textContent=timeString();if(state.auditEnds){$$('.agent-state').forEach(el=>{el.textContent='Inspeccionando';el.classList.add('working')})}else{$$('.agent-state').forEach(el=>{el.textContent='En espera';el.classList.remove('working')})}},700);fetchSample();resetPoll()}
+init();
+})();
+</script>
+</body></html>
